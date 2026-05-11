@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SkillQuest — Learn the Skills Schools Skip</title>
+  <meta name="description" content="SkillQuest is a free gamified learning platform teaching financial literacy, AI, cybersecurity, digital skills, career readiness, and entrepreneurship.">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* Photo card overrides for homepage */
+    .subject-photo-card {
+      position: relative;
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      text-decoration: none;
+      color: white;
+      min-height: 280px;
+      box-shadow: var(--shadow-md);
+      transition: transform 0.22s ease, box-shadow 0.22s ease;
+    }
+    .subject-photo-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 48px rgba(0,0,0,0.18);
+    }
+    .subject-photo-card img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .subject-photo-card .spc-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.3) 55%, rgba(0,0,0,0.1) 100%);
+    }
+    .subject-photo-card .spc-content {
+      position: relative;
+      margin-top: auto;
+      padding: 24px;
+    }
+    .subject-photo-card h3 {
+      font-size: 18px;
+      font-weight: 800;
+      margin-bottom: 6px;
+      color: white;
+    }
+    .subject-photo-card p {
+      font-size: 13px;
+      color: rgba(255,255,255,0.82);
+      line-height: 1.6;
+      margin-bottom: 12px;
+    }
+    .spc-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 700;
+      color: white;
+      opacity: 0.9;
+      letter-spacing: 0.02em;
+    }
+    .spc-stat {
+      display: inline-block;
+      background: rgba(255,255,255,0.15);
+      backdrop-filter: blur(4px);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 999px;
+      padding: 3px 10px;
+      font-size: 11px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.9);
+      margin-bottom: 10px;
+    }
+
+    /* Feature photo cards */
+    .feature-photo-card {
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      background: white;
+      border: 1px solid var(--slate-200);
+      box-shadow: var(--shadow-sm);
+      transition: transform 0.22s ease, box-shadow 0.22s ease;
+    }
+    .feature-photo-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-md);
+    }
+    .feature-photo-card img {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+      display: block;
+    }
+    .feature-photo-card .fpc-body {
+      padding: 20px;
+    }
+    .feature-photo-card h3 {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+    .feature-photo-card p {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.65;
+    }
+
+    /* About / Why section */
+    .why-section {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 48px;
+      align-items: center;
+    }
+    @media (max-width: 768px) {
+      .why-section { grid-template-columns: 1fr; }
+      .why-photo { order: -1; }
+    }
+    .why-photo img {
+      width: 100%;
+      border-radius: var(--radius-2xl);
+      box-shadow: var(--shadow-lg);
+      display: block;
+    }
+    .why-text h2 {
+      font-size: clamp(26px, 3.5vw, 38px);
+      font-weight: 800;
+      color: var(--text-primary);
+      margin-bottom: 16px;
+      letter-spacing: -0.5px;
+    }
+    .why-text p {
+      font-size: 16px;
+      color: var(--text-muted);
+      line-height: 1.75;
+      margin-bottom: 16px;
+    }
+    .why-check {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .why-check-icon {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .why-check-icon svg { display: block; }
+    .why-check-text {
+      font-size: 15px;
+      color: var(--text-primary);
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+<div id="navbar"></div>
+<div class="nav-spacer"></div>
+
+<!-- ═══════════════════════════════════════════
+     HERO
+════════════════════════════════════════════ -->
+<section class="hero">
+  <div class="hero-container">
+    <h1>Learn the Skills<br><span>School Never Taught&nbsp;You</span></h1>
+    <p class="hero-subtitle">SkillQuest is a free, gamified platform for students who want to get ahead. Earn points, beat quizzes, and build knowledge that translates to real life — not just exams.</p>
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <span class="hero-stat-num">24</span>
+        <span class="hero-stat-label">Free courses</span>
+      </div>
+      <div class="hero-stat">
+        <span class="hero-stat-num">6</span>
+        <span class="hero-stat-label">Subject areas</span>
+      </div>
+      <div class="hero-stat">
+        <span class="hero-stat-num">80%</span>
+        <span class="hero-stat-label">Pass rate for cert.</span>
+      </div>
+      <div class="hero-stat">
+        <span class="hero-stat-num">$0</span>
+        <span class="hero-stat-label">Cost, ever</span>
+      </div>
+    </div>
+    <div class="hero-cta">
+      <a href="signup.html" class="btn btn-primary btn-xl">Start learning &mdash; it's free</a>
+      <a href="courses.html" class="btn btn-outline btn-xl" style="color:white;border-color:rgba(255,255,255,0.65);background:rgba(255,255,255,0.1);">Browse courses</a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     SUBJECTS — Photo cards
+════════════════════════════════════════════ -->
+<section class="section">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-tag">Six Subjects</div>
+      <h2>Gaps Schools Leave Open</h2>
+      <p>From budgeting to AI, these are the topics most curricula skip entirely — but that matter most in adult life.</p>
+    </div>
+    <div class="subjects-grid">
+
+      <a href="subject.html?id=finance" class="subject-photo-card">
+        <img src="https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=600&q=80&auto=format&fit=crop" alt="Financial literacy" loading="lazy">
+        <div class="spc-overlay"></div>
+        <div class="spc-content">
+          <span class="spc-stat">Only 26% of young adults pass basic finance literacy tests</span>
+          <h3>Financial Literacy</h3>
+          <p>Budgeting, credit scores, investing, and building wealth from any starting point.</p>
+          <span class="spc-cta">Explore courses &#8594;</span>
+        </div>
+      </a>
+
+      <a href="subject.html?id=ai-tech" class="subject-photo-card">
+        <img src="https://images.unsplash.com/photo-1677442135703-1787eea5ce01?w=600&q=80&auto=format&fit=crop" alt="AI and technology" loading="lazy">
+        <div class="spc-overlay"></div>
+        <div class="spc-content">
+          <span class="spc-stat">AI has already displaced 85M jobs — and is creating 97M new ones</span>
+          <h3>AI Fundamentals</h3>
+          <p>Understand how AI works, what it can and cannot do, and how to work alongside it.</p>
+          <span class="spc-cta">Explore courses &#8594;</span>
+        </div>
+      </a>
+
+      <a href="subject.html?id=cybersecurity" class="subject-photo-card">
+        <img src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=600&q=80&auto=format&fit=crop" alt="Cybersecurity" loading="lazy">
+        <div class="spc-overlay"></div>
+        <div class="spc-content">
+          <span class="spc-stat">95% of security breaches start with human error</span>
+          <h3>Cybersecurity</h3>
+          <p>Protect your accounts, data, and identity. Practical security for everyday life.</p>
+          <span class="spc-cta">Explore courses &#8594;</span>
+        </div>
+      </a>
+
+      <a href="subject.html?id=digital" class="subject-photo-card">
+        <img src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=600&q=80&auto=format&fit=crop" alt="Digital skills" loading="lazy">
+        <div class="spc-overlay"></div>
+        <div class="spc-content">
+          <span class="spc-stat">1.4 billion people still lack basic digital literacy</span>
+          <h3>Digital Skills</h3>
+          <p>Productivity tools, data basics, professional communication — what the workplace expects.</p>
+          <span class="spc-cta">Explore courses &#8594;</span>
+        </div>
+      </a>
+
+      <a href="subject.html?id=career" class="subject-photo-card">
+        <img src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=600&q=80&auto=format&fit=crop" alt="Career readiness" loading="lazy">
+        <div class="spc-overlay"></div>
+        <div class="spc-content">
+          <span class="spc-stat">60% of employers say new graduates arrive unprepared</span>
+          <h3>Career Readiness</h3>
+          <p>CVs, interviews, networking, and the soft skills that make the difference on day one.</p>
+          <span class="spc-cta">Explore courses &#8594;</span>
+        </div>
+      </a>
+
+      <a href="subject.html?id=entrepreneurship" class="subject-photo-card">
+        <img src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=600&q=80&auto=format&fit=crop" alt="Entrepreneurship" loading="lazy">
+        <div class="spc-overlay"></div>
+        <div class="spc-content">
+          <span class="spc-stat">Only 1 in 10 students gets any entrepreneurship education</span>
+          <h3>Entrepreneurship</h3>
+          <p>Ideation, validation, lean startup thinking — whether you want to build or just think like a founder.</p>
+          <span class="spc-cta">Explore courses &#8594;</span>
+        </div>
+      </a>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     WHY SKILLQUEST — Photo + Text
+════════════════════════════════════════════ -->
+<section class="section" style="background:var(--slate-100);padding:80px 0;">
+  <div class="container">
+    <div class="why-section">
+      <div class="why-photo">
+        <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=700&q=80&auto=format&fit=crop" alt="Students learning together">
+      </div>
+      <div class="why-text">
+        <div class="section-tag" style="margin-bottom:16px;">Why SkillQuest</div>
+        <h2>Built for the gap between school and life</h2>
+        <p>Most curricula are designed for exams, not for the world graduates step into. SkillQuest fills that gap with short, practical courses on topics that employers, banks, and the internet already expect you to know.</p>
+        <div class="why-check">
+          <div class="why-check-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <span class="why-check-text">100% free — no subscription, no credit card, ever</span>
+        </div>
+        <div class="why-check">
+          <div class="why-check-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <span class="why-check-text">Short lessons designed for 15–20 minute sessions</span>
+        </div>
+        <div class="why-check">
+          <div class="why-check-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <span class="why-check-text">Certificate of completion for every course you pass</span>
+        </div>
+        <div class="why-check">
+          <div class="why-check-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <span class="why-check-text">Points, leaderboard, and prizes to keep you going</span>
+        </div>
+        <a href="about.html" class="btn btn-primary" style="margin-top:24px;">Learn more about the project</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     HOW IT WORKS
+════════════════════════════════════════════ -->
+<section class="section" style="padding:80px 0;">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-tag">How It Works</div>
+      <h2>From sign-up to certificate in four steps</h2>
+      <p>No subscription, no software, no catch. Just courses you can start right now.</p>
+    </div>
+    <div class="steps-grid">
+      <div class="step-card">
+        <div class="step-num">1</div>
+        <h3>Create a free account</h3>
+        <p>Sign up in under a minute. No payment details, no software to install — just an email and a password.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-num">2</div>
+        <h3>Pick what interests you</h3>
+        <p>Browse 6 subjects and 24 courses. Start anywhere — there is no required order or prerequisite.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-num">3</div>
+        <h3>Work through the lessons</h3>
+        <p>Short, focused lessons followed by a multiple-choice quiz. Learn at your own pace, on any device.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-num">4</div>
+        <h3>Earn points and certificates</h3>
+        <p>Score 80% or above to unlock a course certificate. Accumulate points and climb the leaderboard.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     FEATURES — Photo cards
+════════════════════════════════════════════ -->
+<section class="section dark-section" style="padding:80px 0;">
+  <div class="container">
+    <div class="section-header">
+      <h2>Everything you need to keep going</h2>
+      <p>Goals, rankings, and rewards that make sitting down to study actually feel worthwhile.</p>
+    </div>
+    <div class="features-grid">
+
+      <div class="feature-photo-card">
+        <img src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=500&q=80&auto=format&fit=crop" alt="Quiz scoring" loading="lazy">
+        <div class="fpc-body">
+          <h3>Quiz-Based Points</h3>
+          <p>Every course ends with a quiz. Score higher, earn more points. Your total score is visible on your profile and drives your leaderboard rank.</p>
+        </div>
+      </div>
+
+      <div class="feature-photo-card">
+        <img src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=500&q=80&auto=format&fit=crop" alt="Students competing on leaderboard" loading="lazy">
+        <div class="fpc-body">
+          <h3>Live Leaderboard</h3>
+          <p>Compare your score against other learners. Updated after every quiz — see your rank climb as you complete more courses.</p>
+        </div>
+      </div>
+
+      <div class="feature-photo-card">
+        <img src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=500&q=80&auto=format&fit=crop" alt="Certificate of completion" loading="lazy">
+        <div class="fpc-body">
+          <h3>Course Certificates</h3>
+          <p>Pass a quiz with 80% or above and you unlock a printable certificate of completion — ready to add to your LinkedIn or portfolio.</p>
+        </div>
+      </div>
+
+      <div class="feature-photo-card">
+        <img src="https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=500&q=80&auto=format&fit=crop" alt="Rewards and gift cards" loading="lazy">
+        <div class="fpc-body">
+          <h3>Rewards Lottery</h3>
+          <p>Spend your earned points to enter monthly prize draws — gift cards, stationery, and other real-world rewards.</p>
+        </div>
+      </div>
+
+      <div class="feature-photo-card">
+        <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=500&q=80&auto=format&fit=crop" alt="Progress dashboard" loading="lazy">
+        <div class="fpc-body">
+          <h3>Progress Dashboard</h3>
+          <p>Your personal dashboard tracks every subject, every lesson, and every quiz score — so you always know exactly where you stand.</p>
+        </div>
+      </div>
+
+      <div class="feature-photo-card">
+        <img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=500&q=80&auto=format&fit=crop" alt="Learning at your own pace" loading="lazy">
+        <div class="fpc-body">
+          <h3>Learn at Your Pace</h3>
+          <p>No deadlines, no schedules. Start a lesson, pause whenever you need to, and pick up right where you left off on any device.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- no contact form on homepage — see contact.html -->
+
+<!-- ═══════════════════════════════════════════
+     FINAL CTA
+════════════════════════════════════════════ -->
+<section class="section" style="background:linear-gradient(135deg,var(--dark-900),#1a1060);text-align:center;padding:80px 0;">
+  <div class="container">
+    <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:999px;padding:6px 18px;margin-bottom:24px;">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="#10b981" stroke="none"><circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+      <span style="color:rgba(255,255,255,0.75);font-size:13px;font-weight:600;">No credit card. No trial period. Free from day one.</span>
+    </div>
+    <h2 style="color:white;font-size:clamp(28px,4vw,44px);font-weight:800;margin-bottom:12px;letter-spacing:-1px;">Pick a course and start today</h2>
+    <p style="color:rgba(255,255,255,0.6);font-size:17px;max-width:480px;margin:0 auto 32px;line-height:1.7;">24 courses, 6 subjects, certificates included. You can be through your first lesson in under 20 minutes.</p>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+      <a href="signup.html" class="btn btn-primary btn-xl">Create your free account</a>
+      <a href="courses.html" class="btn btn-outline btn-xl" style="color:white;border-color:rgba(255,255,255,0.4);background:rgba(255,255,255,0.08);">Browse all courses</a>
+    </div>
+  </div>
+</section>
+
+<div id="footer"></div>
+
+<!-- ═══════════════════════════════════════════
+     SUBJECT MODALS
+════════════════════════════════════════════ -->
+<div class="modal-overlay" id="modal-financial">
+  <div class="modal"><div class="modal-header"><h2 class="modal-title">Financial Literacy</h2><button class="modal-close" onclick="closeModal('modal-financial')">&times;</button></div>
+  <div class="modal-body"><p style="margin-bottom:16px;color:var(--text-muted);">Financial literacy is one of the most impactful skills you can develop, yet it is rarely covered in school in any meaningful depth.</p><h4 style="font-weight:700;margin-bottom:10px;">The numbers</h4><ul style="margin-bottom:20px;padding-left:20px;list-style:disc;color:var(--text-muted);font-size:14px;line-height:2;"><li>Only 26% of young adults can correctly answer basic financial questions</li><li>People with financial literacy save 3× more than those without it</li><li>Most household debt stems from decisions made without financial education</li></ul><h4 style="font-weight:700;margin-bottom:10px;">What you will learn</h4><p style="color:var(--text-muted);font-size:14px;line-height:1.7;">Four courses covering personal budgeting, investing basics, credit scores, and long-term wealth building.</p></div>
+  <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modal-financial')">Close</button><a href="subject.html?id=finance" class="btn btn-primary">View courses</a></div></div>
+</div>
+
+<div class="modal-overlay" id="modal-ai">
+  <div class="modal"><div class="modal-header"><h2 class="modal-title">AI Fundamentals</h2><button class="modal-close" onclick="closeModal('modal-ai')">&times;</button></div>
+  <div class="modal-body"><p style="margin-bottom:16px;color:var(--text-muted);">Artificial intelligence has already reshaped entire industries. Understanding it is becoming a baseline expectation, not a specialist skill.</p><h4 style="font-weight:700;margin-bottom:10px;">The numbers</h4><ul style="margin-bottom:20px;padding-left:20px;list-style:disc;color:var(--text-muted);font-size:14px;line-height:2;"><li>AI has already displaced 85 million jobs — and is creating 97 million new ones</li><li>Workers who understand AI tools earn measurably more on average</li><li>Most employers now list AI literacy as a desirable attribute in job postings</li></ul><h4 style="font-weight:700;margin-bottom:10px;">What you will learn</h4><p style="color:var(--text-muted);font-size:14px;line-height:1.7;">From basic AI concepts to machine learning, deep learning, and AI ethics. You will finish with a solid foundation.</p></div>
+  <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modal-ai')">Close</button><a href="subject.html?id=ai-tech" class="btn btn-primary">View courses</a></div></div>
+</div>
+
+<div class="modal-overlay" id="modal-cyber">
+  <div class="modal"><div class="modal-header"><h2 class="modal-title">Cybersecurity</h2><button class="modal-close" onclick="closeModal('modal-cyber')">&times;</button></div>
+  <div class="modal-body"><p style="margin-bottom:16px;color:var(--text-muted);">Every internet user is a potential target. Basic cybersecurity knowledge is essential for protecting yourself online.</p><h4 style="font-weight:700;margin-bottom:10px;">The numbers</h4><ul style="margin-bottom:20px;padding-left:20px;list-style:disc;color:var(--text-muted);font-size:14px;line-height:2;"><li>Cybercrime costs the world over $8 trillion USD annually</li><li>95% of cybersecurity breaches are caused by human error</li><li>A cyberattack occurs every 39 seconds somewhere in the world</li></ul><h4 style="font-weight:700;margin-bottom:10px;">What you will learn</h4><p style="color:var(--text-muted);font-size:14px;line-height:1.7;">Online safety practices, strong password strategies, how to spot phishing, and how to protect your digital privacy.</p></div>
+  <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modal-cyber')">Close</button><a href="subject.html?id=cybersecurity" class="btn btn-primary">View courses</a></div></div>
+</div>
+
+<div class="modal-overlay" id="modal-digital">
+  <div class="modal"><div class="modal-header"><h2 class="modal-title">Digital Skills</h2><button class="modal-close" onclick="closeModal('modal-digital')">&times;</button></div>
+  <div class="modal-body"><p style="margin-bottom:16px;color:var(--text-muted);">Digital tools are the backbone of the modern economy. Fluency in them is increasingly the baseline for employment.</p><h4 style="font-weight:700;margin-bottom:10px;">The numbers</h4><ul style="margin-bottom:20px;padding-left:20px;list-style:disc;color:var(--text-muted);font-size:14px;line-height:2;"><li>1.4 billion people worldwide lack basic digital literacy</li><li>90% of jobs now require some form of digital skill</li><li>Digital skill gaps cost companies over $1.3 trillion annually in lost productivity</li></ul><h4 style="font-weight:700;margin-bottom:10px;">What you will learn</h4><p style="color:var(--text-muted);font-size:14px;line-height:1.7;">Productivity tools, cloud computing basics, professional digital communication, and data analysis fundamentals.</p></div>
+  <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modal-digital')">Close</button><a href="subject.html?id=digital" class="btn btn-primary">View courses</a></div></div>
+</div>
+
+<div class="modal-overlay" id="modal-career">
+  <div class="modal"><div class="modal-header"><h2 class="modal-title">Career Readiness</h2><button class="modal-close" onclick="closeModal('modal-career')">&times;</button></div>
+  <div class="modal-body"><p style="margin-bottom:16px;color:var(--text-muted);">Academic credentials alone are not enough anymore. Employers increasingly value practical skills that most schools never teach.</p><h4 style="font-weight:700;margin-bottom:10px;">The numbers</h4><ul style="margin-bottom:20px;padding-left:20px;list-style:disc;color:var(--text-muted);font-size:14px;line-height:2;"><li>Over 60% of employers say new graduates are not workplace-ready</li><li>75% of employers prioritise soft skills over technical ones when hiring</li><li>Professionals who network effectively advance faster in their careers</li></ul><h4 style="font-weight:700;margin-bottom:10px;">What you will learn</h4><p style="color:var(--text-muted);font-size:14px;line-height:1.7;">How to write a compelling CV, handle interviews, build a professional network, and communicate effectively at work.</p></div>
+  <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modal-career')">Close</button><a href="subject.html?id=career" class="btn btn-primary">View courses</a></div></div>
+</div>
+
+<div class="modal-overlay" id="modal-entrepreneur">
+  <div class="modal"><div class="modal-header"><h2 class="modal-title">Entrepreneurship</h2><button class="modal-close" onclick="closeModal('modal-entrepreneur')">&times;</button></div>
+  <div class="modal-body"><p style="margin-bottom:16px;color:var(--text-muted);">Entrepreneurial thinking is valuable whether you start your own business or work within an organization.</p><h4 style="font-weight:700;margin-bottom:10px;">The numbers</h4><ul style="margin-bottom:20px;padding-left:20px;list-style:disc;color:var(--text-muted);font-size:14px;line-height:2;"><li>Only 1 in 10 high school students receives any entrepreneurship education</li><li>Businesses started by founders with formal training are 6× more likely to succeed</li><li>Entrepreneurial thinking consistently ranks as one of the top skills Fortune 500 companies seek</li></ul><h4 style="font-weight:700;margin-bottom:10px;">What you will learn</h4><p style="color:var(--text-muted);font-size:14px;line-height:1.7;">Business ideation and validation, the Lean Startup approach, marketing fundamentals, and leadership skills.</p></div>
+  <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modal-entrepreneur')">Close</button><a href="subject.html?id=entrepreneurship" class="btn btn-primary">View courses</a></div></div>
+</div>
+
+<script src="js/api.js"></script>
+<script src="js/data.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/utils.js"></script>
+<script>initPage();</script>
+</body>
+</html>

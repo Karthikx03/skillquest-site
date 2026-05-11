@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact - SkillQuest</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="navbar"></div>
+<div class="nav-spacer"></div>
+
+<div class="page-header">
+  <div class="container">
+    <h1>Connect With Us</h1>
+    <p>We read every message. Your feedback helps make SkillQuest better.</p>
+  </div>
+</div>
+
+<section class="section">
+  <div class="container">
+    <div class="contact-grid">
+
+      <!-- Contact Info -->
+      <div>
+        <h2 style="font-size:24px;font-weight:800;margin-bottom:24px;">Get In Touch</h2>
+        <div class="contact-info-card">
+          <span class="contact-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></span>
+          <div>
+            <h4>Email</h4>
+            <p><a href="mailto:hello@skillquest.dev" style="color:var(--primary);">hello@skillquest.dev</a></p>
+          </div>
+        </div>
+        <div class="contact-info-card">
+          <span class="contact-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg></span>
+          <div>
+            <h4>LinkedIn</h4>
+            <p><a href="https://linkedin.com/company/skillquest" target="_blank" style="color:var(--primary);">linkedin.com/company/skillquest</a></p>
+          </div>
+        </div>
+        <div class="contact-info-card">
+          <span class="contact-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg></span>
+          <div>
+            <h4>GitHub</h4>
+            <p><a href="https://github.com/skillquest" target="_blank" style="color:var(--primary);">github.com/skillquest</a></p>
+          </div>
+        </div>
+        <div class="contact-info-card">
+          <span class="contact-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></span>
+          <div>
+            <h4>Office</h4>
+            <p>No. 1, Zhongzheng Rd, Zhongzheng District, Taipei, Taiwan</p>
+          </div>
+        </div>
+
+        <div style="margin-top:32px;padding:24px;background:var(--slate-100);border-radius:var(--radius-xl);">
+          <h4 style="font-weight:700;margin-bottom:8px;">Response Time</h4>
+          <p style="font-size:14px;color:var(--text-muted);line-height:1.7;">We typically respond within 24 hours on weekdays. For urgent matters, email us directly at hello@skillquest.dev.</p>
+        </div>
+      </div>
+
+      <!-- Contact Form -->
+      <div>
+        <div style="background:white;border-radius:var(--radius-2xl);padding:36px;box-shadow:var(--shadow-sm);border:1px solid var(--slate-200);">
+          <h2 style="font-size:22px;font-weight:800;margin-bottom:24px;">Send a Message</h2>
+          <div id="contactSuccess" style="display:none;background:#d1fae5;border:1px solid #a7f3d0;color:#065f46;padding:16px;border-radius:var(--radius-sm);margin-bottom:20px;font-weight:500;">
+            Thank you! We will get back to you within 24 hours.
+          </div>
+          <form id="contactForm" onsubmit="submitContact(event)">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+              <div class="form-group">
+                <label class="form-label">Name *</label>
+                <input type="text" class="form-input" id="cName" placeholder="Your name" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Email *</label>
+                <input type="email" class="form-input" id="cEmail" placeholder="your@email.com" required>
+              </div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+              <div class="form-group">
+                <label class="form-label">Type</label>
+                <select class="form-input form-select" id="cType">
+                  <option>Feedback</option>
+                  <option>Question</option>
+                  <option>Bug Report</option>
+                  <option>Partnership</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Subject *</label>
+                <input type="text" class="form-input" id="cSubject" placeholder="Brief subject" required>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Message *</label>
+              <textarea class="form-input textarea" id="cMessage" rows="6" placeholder="Tell us what's on your mind..." required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width:100%;">Send Message</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="section" style="background:var(--slate-100);">
+  <div class="container" style="max-width:720px;">
+    <div class="section-header">
+      <div class="section-tag">FAQ</div>
+      <h2>Frequently Asked Questions</h2>
+    </div>
+    <div id="faqContainer">
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          Is SkillQuest really free?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">Yes, completely. All 24 courses, quizzes, and certificates are free and will remain free. We believe quality education should not have a price tag. The only costs are for optional rewards in the lottery system.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          How do I earn points?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">You earn points by completing quizzes at the end of each course. The number of points you earn is proportional to your quiz score. For example, if a course offers 50 points and you score 80%, you earn 40 points. Complete all lessons before taking the quiz for the best results.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          Are the certificates recognized?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">SkillQuest certificates demonstrate that you have studied and been tested on the course content. While they are not accredited professional certifications, they are valuable additions to your portfolio, resume, or LinkedIn profile and demonstrate initiative and self-improvement.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          Can I retake a quiz?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">Yes! You can retake any quiz as many times as you like. The most recent score is recorded. We encourage you to review the lesson content between attempts to improve your understanding and your score.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          How does the rewards lottery work?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">Each prize draw requires a certain number of points to enter. When you click "Enter Draw," the points are deducted from your balance and your name is added to the pool. Winners are selected randomly from all entered participants. Results are announced monthly.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div id="footer"></div>
+<script src="js/api.js"></script>
+<script src="js/data.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/utils.js"></script>
+<script>
+  initPage();
+
+  function toggleFaq(btn) {
+    const answer = btn.nextElementSibling;
+    const isOpen = answer.classList.contains('open');
+    // Close all
+    document.querySelectorAll('.faq-question').forEach(q => q.classList.remove('open'));
+    document.querySelectorAll('.faq-answer').forEach(a => a.classList.remove('open'));
+    if (!isOpen) {
+      btn.classList.add('open');
+      answer.classList.add('open');
+    }
+  }
+
+  function submitContact(e) {
+    e.preventDefault();
+    const name = document.getElementById('cName').value.trim();
+    const email = document.getElementById('cEmail').value.trim();
+    const type = document.getElementById('cType').value;
+    const subject = document.getElementById('cSubject').value.trim();
+    const message = document.getElementById('cMessage').value.trim();
+
+    if (!name || !email || !subject || !message) {
+      showToast('Please fill in all required fields.', 'error');
+      return;
+    }
+
+    const contacts = JSON.parse(localStorage.getItem('sq_contacts') || '[]');
+    contacts.push({ name, email, type, subject, message, date: new Date().toISOString() });
+    localStorage.setItem('sq_contacts', JSON.stringify(contacts));
+
+    document.getElementById('contactForm').reset();
+    document.getElementById('contactSuccess').style.display = 'block';
+    showToast('Message sent! Thank you for reaching out.', 'success');
+  }
+</script>
+</body>
+</html>

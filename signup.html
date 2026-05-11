@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Up - SkillQuest</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="navbar"></div>
+<div class="auth-page">
+  <div class="auth-card">
+    <div class="auth-header">
+      <div class="logo-icon">SQ</div>
+      <h1>Create Account</h1>
+      <p>Join thousands of learners on SkillQuest. It is completely free.</p>
+    </div>
+    <div id="signupError" class="error-message"></div>
+    <form onsubmit="handleSignup(event)">
+      <div class="form-group">
+        <label class="form-label">Full Name</label>
+        <input type="text" class="form-input" id="signupName" placeholder="Your full name" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <input type="email" class="form-input" id="signupEmail" placeholder="your@email.com" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input type="password" class="form-input" id="signupPassword" placeholder="At least 6 characters" required oninput="checkPasswordStrength(this.value)">
+        <div class="password-strength" id="passwordStrength" style="display:none;">
+          <div class="strength-bar"><div class="strength-fill" id="strengthFill"></div></div>
+          <span class="strength-label" id="strengthLabel"></span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Confirm Password</label>
+        <input type="password" class="form-input" id="signupConfirm" placeholder="Repeat your password" required>
+      </div>
+      <button type="submit" class="btn btn-primary" style="width:100%;margin-top:8px;" id="signupBtn">Create Account</button>
+    </form>
+    <div class="auth-footer">
+      Already have an account? <a href="login.html">Login</a>
+    </div>
+  </div>
+</div>
+<script src="js/api.js"></script>
+<script src="js/data.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/utils.js"></script>
+<script>
+  initPage();
+  if (isLoggedIn()) window.location.href = 'dashboard.html';
+
+  function checkPasswordStrength(val) {
+    const div = document.getElementById('passwordStrength');
+    const fill = document.getElementById('strengthFill');
+    const label = document.getElementById('strengthLabel');
+    if (!val) { div.style.display = 'none'; return; }
+    div.style.display = 'block';
+    let strength = 'weak';
+    if (val.length >= 8 && /[A-Z]/.test(val) && /[0-9]/.test(val)) strength = 'strong';
+    else if (val.length >= 6) strength = 'medium';
+    fill.className = 'strength-fill ' + strength;
+    label.className = 'strength-label ' + strength;
+    label.textContent = strength.charAt(0).toUpperCase() + strength.slice(1);
+  }
+
+  async function handleSignup(e) {
+    e.preventDefault();
+    const name = document.getElementById('signupName').value;
+    const email = document.getElementById('signupEmail').value;
+    const password = document.getElementById('signupPassword').value;
+    const confirm = document.getElementById('signupConfirm').value;
+    const btn = document.getElementById('signupBtn');
+    const errDiv = document.getElementById('signupError');
+
+    if (password !== confirm) {
+      errDiv.textContent = 'Passwords do not match.';
+      errDiv.className = 'error-message show';
+      return;
+    }
+
+    btn.disabled    = true;
+    btn.textContent = 'Creating account...';
+
+    const result = await signup(name, email, password);
+    if (result.success) {
+      showToast('Welcome to SkillQuest, ' + result.user.name + '!', 'success');
+      setTimeout(() => { window.location.href = 'dashboard.html'; }, 600);
+    } else {
+      errDiv.textContent = result.error;
+      errDiv.className   = 'error-message show';
+      btn.disabled       = false;
+      btn.textContent    = 'Create account';
+    }
+  }
+</script>
+</body>
+</html>

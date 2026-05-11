@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lesson - SkillQuest</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="navbar"></div>
+<div class="nav-spacer"></div>
+
+<section class="section">
+  <div class="container">
+    <div class="breadcrumb" id="breadcrumb"></div>
+    <div class="lesson-layout" id="lessonLayout">
+      <!-- Sidebar -->
+      <div class="lesson-sidebar">
+        <h3>Course Lessons</h3>
+        <div id="lessonNav"></div>
+        <div style="margin-top:20px;padding-top:20px;border-top:1px solid var(--slate-200);">
+          <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px;font-weight:600;">COURSE PROGRESS</div>
+          <div class="progress-bar"><div class="progress-fill" id="sidebarProgress" style="width:0%"></div></div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:6px;" id="sidebarProgressLabel">0 of 0 lessons</div>
+        </div>
+      </div>
+      <!-- Main content -->
+      <div>
+        <div class="lesson-content-card">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px;flex-wrap:wrap;">
+            <span class="badge badge-primary" id="lessonNumBadge">Lesson 1</span>
+            <span class="badge badge-gray" id="lessonDurationBadge"></span>
+          </div>
+          <h1 style="font-size:clamp(22px,3vw,32px);font-weight:800;margin-bottom:24px;letter-spacing:-0.5px;" id="lessonTitle">Loading...</h1>
+          <div class="lesson-content-text" id="lessonContent"></div>
+          <div class="lesson-nav">
+            <button class="btn btn-secondary" id="prevBtn" onclick="goLesson(-1)">← Previous</button>
+            <button class="btn btn-primary" id="nextBtn" onclick="markAndNext()">Mark as Complete &amp; Continue →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div id="footer"></div>
+<script src="js/api.js"></script>
+<script src="js/data.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/utils.js"></script>
+<script>
+  requireAuth();
+  initPage();
+
+  const params = new URLSearchParams(window.location.search);
+  const subjectId = params.get('subject');
+  const courseId = params.get('course');
+  let currentLesson = parseInt(params.get('lesson') || '0');
+  const user = getCurrentUser();
+
+  const subject = SUBJECTS.find(s => s.id === subjectId);
+  const course = subject ? subject.courses.find(c => c.id === courseId) : null;
+
+  if (!subject || !course) {
+    document.getElementById('lessonTitle').textContent = 'Course not found.';
+  } else {
+    document.title = course.title + ' - SkillQuest';
+
+    function updateView() {
+      const lesson = course.lessons[currentLesson];
+      if (!lesson) return;
+
+      const cp = getCourseProgress(user.id, subjectId, courseId);
+
+      // Breadcrumb
+      document.getElementById('breadcrumb').innerHTML = `
+        <a href="courses.html">Courses</a><span>›</span>
+        <a href="subject.html?id=${subjectId}">${subject.title}</a><span>›</span>
+        <a href="subject.html?id=${subjectId}">${course.title}</a><span>›</span>
+        <span>${lesson.title}</span>
+      `;
+
+      // Lesson content
+      document.getElementById('lessonNumBadge').textContent = 'Lesson ' + (currentLesson + 1) + ' of ' + course.lessons.length;
+      document.getElementById('lessonDurationBadge').textContent = course.duration;
+      document.getElementById('lessonTitle').textContent = lesson.title;
+      document.getElementById('lessonContent').innerHTML = lesson.content.split('\n\n').map(p => '<p>' + p + '</p>').join('');
+
+      // Sidebar nav
+      document.getElementById('lessonNav').innerHTML = course.lessons.map((l, i) => {
+        const done = cp.lessonsCompleted.includes(l.id);
+        const active = i === currentLesson;
+        return `
+          <div class="lesson-nav-item ${active ? 'active' : ''} ${done ? 'completed' : ''}" onclick="jumpLesson(${i})">
+            <div class="lesson-check ${done ? 'done' : active ? 'current' : ''}">${done ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>' : i + 1}</div>
+            <span>${l.title}</span>
+          </div>
+        `;
+      }).join('');
+
+      // Progress bar
+      const donePct = Math.round(cp.lessonsCompleted.length / course.lessons.length * 100);
+      document.getElementById('sidebarProgress').style.width = donePct + '%';
+      document.getElementById('sidebarProgressLabel').textContent = cp.lessonsCompleted.length + ' of ' + course.lessons.length + ' lessons';
+
+      // Nav buttons
+      const prevBtn = document.getElementById('prevBtn');
+      const nextBtn = document.getElementById('nextBtn');
+      prevBtn.style.visibility = currentLesson === 0 ? 'hidden' : 'visible';
+
+      if (currentLesson === course.lessons.length - 1) {
+        if (cp.completed) {
+          nextBtn.textContent = 'Retake Quiz →';
+        } else {
+          nextBtn.textContent = 'Mark as Complete & Take Quiz →';
+        }
+      } else {
+        nextBtn.textContent = 'Mark as Complete & Continue →';
+      }
+
+      // Update URL
+      const url = new URL(window.location);
+      url.searchParams.set('lesson', currentLesson);
+      window.history.replaceState({}, '', url);
+    }
+
+    function markAndNext() {
+      const lesson = course.lessons[currentLesson];
+      markLessonComplete(user.id, subjectId, courseId, lesson.id);
+      showToast('Lesson completed!', 'success');
+      if (currentLesson < course.lessons.length - 1) {
+        currentLesson++;
+        updateView();
+        window.scrollTo(0, 0);
+      } else {
+        window.location.href = 'quiz.html?subject=' + subjectId + '&course=' + courseId;
+      }
+    }
+
+    function goLesson(dir) {
+      const next = currentLesson + dir;
+      if (next < 0 || next >= course.lessons.length) return;
+      currentLesson = next;
+      updateView();
+      window.scrollTo(0, 0);
+    }
+
+    function jumpLesson(i) {
+      currentLesson = i;
+      updateView();
+      window.scrollTo(0, 0);
+    }
+
+    window.goLesson = goLesson;
+    window.jumpLesson = jumpLesson;
+    window.markAndNext = markAndNext;
+
+    updateView();
+  }
+</script>
+</body>
+</html>

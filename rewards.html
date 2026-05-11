@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rewards - SkillQuest</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="navbar"></div>
+<div class="nav-spacer"></div>
+
+<div class="page-header">
+  <div class="container">
+    <div class="section-tag" style="color:rgba(255,255,255,0.7);background:rgba(255,255,255,0.1);">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>Rewards
+    </div>
+    <h1>Rewards &amp; Lottery</h1>
+    <p>Earn points by completing courses, then redeem them for prizes.</p>
+  </div>
+</div>
+
+<section class="section">
+  <div class="container">
+
+    <!-- Points balance -->
+    <div style="background:linear-gradient(135deg,#f59e0b,#d97706);border-radius:var(--radius-2xl);padding:32px;color:white;text-align:center;margin-bottom:48px;box-shadow:0 8px 32px rgba(245,158,11,0.3);">
+      <div style="font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;opacity:0.85;margin-bottom:8px;">Your Points Balance</div>
+      <div style="font-size:64px;font-weight:900;line-height:1;" id="pointsDisplay">0</div>
+      <div style="opacity:0.8;margin-top:8px;font-size:15px;">points available to spend</div>
+      <a href="courses.html" style="display:inline-block;margin-top:20px;padding:10px 24px;background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.4);border-radius:999px;color:white;font-weight:600;font-size:14px;">Earn more points &#8594;</a>
+    </div>
+
+    <!-- How it works -->
+    <div style="background:var(--slate-100);border-radius:var(--radius-xl);padding:24px 32px;margin-bottom:48px;display:flex;align-items:center;gap:24px;flex-wrap:wrap;">
+      <div style="flex-shrink:0;">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      </div>
+      <div>
+        <h3 style="font-weight:700;margin-bottom:4px;">How It Works</h3>
+        <p style="color:var(--text-muted);font-size:14px;">Complete courses and score well on quizzes to earn points. Use your points to enter prize draws. Winners are selected randomly. Good luck!</p>
+      </div>
+      <div style="display:flex;gap:20px;flex-wrap:wrap;margin-left:auto;align-items:center;">
+        <div style="text-align:center;">
+          <div style="display:flex;justify-content:center;margin-bottom:6px;">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+          </div>
+          <div style="font-size:12px;color:var(--text-muted);font-weight:600;">Complete Courses</div>
+        </div>
+        <div style="color:var(--slate-400);font-size:18px;font-weight:700;">&#8594;</div>
+        <div style="text-align:center;">
+          <div style="display:flex;justify-content:center;margin-bottom:6px;">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </div>
+          <div style="font-size:12px;color:var(--text-muted);font-weight:600;">Earn Points</div>
+        </div>
+        <div style="color:var(--slate-400);font-size:18px;font-weight:700;">&#8594;</div>
+        <div style="text-align:center;">
+          <div style="display:flex;justify-content:center;margin-bottom:6px;">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+          </div>
+          <div style="font-size:12px;color:var(--text-muted);font-weight:600;">Win Prizes</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Prizes grid -->
+    <h2 style="font-size:24px;font-weight:800;margin-bottom:24px;">Available Prizes</h2>
+    <div class="subjects-grid" id="prizesGrid"></div>
+
+    <!-- Past Winners -->
+    <h2 style="font-size:24px;font-weight:800;margin:48px 0 24px;">Recent Winners</h2>
+    <div style="background:white;border-radius:var(--radius-xl);border:1px solid var(--slate-200);box-shadow:var(--shadow-sm);overflow:hidden;">
+      <div style="padding:16px 24px;border-bottom:1px solid var(--slate-200);display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);background:var(--slate-100);">
+        <span>Winner</span><span>Prize</span><span>Date</span>
+      </div>
+      <div style="padding:16px 24px;border-bottom:1px solid var(--slate-200);display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+        <span style="font-weight:600;">Emma C.</span><span>NT$500 Gift Card</span><span style="color:var(--text-muted);font-size:13px;">May 2026</span>
+      </div>
+      <div style="padding:16px 24px;border-bottom:1px solid var(--slate-200);display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+        <span style="font-weight:600;">Leo W.</span><span>1-Month Premium</span><span style="color:var(--text-muted);font-size:13px;">April 2026</span>
+      </div>
+      <div style="padding:16px 24px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+        <span style="font-weight:600;">Sophia L.</span><span>SkillQuest Notebook</span><span style="color:var(--text-muted);font-size:13px;">April 2026</span>
+      </div>
+    </div>
+
+    <!-- Points history -->
+    <h2 style="font-size:24px;font-weight:800;margin:48px 0 24px;">Points History</h2>
+    <div id="pointsHistory" style="background:white;border-radius:var(--radius-xl);border:1px solid var(--slate-200);box-shadow:var(--shadow-sm);overflow:hidden;"></div>
+
+  </div>
+</section>
+
+<div id="footer"></div>
+<script src="js/api.js"></script>
+<script src="js/data.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/utils.js"></script>
+<script>
+  requireAuth();
+  initPage();
+
+  const user = getCurrentUser();
+
+  // SVG icons for prizes
+  const prizeIcons = {
+    p1: '<svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>',
+    p2: '<svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>',
+    p3: '<svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',
+    p4: '<svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>'
+  };
+  const defaultPrizeIcon = '<svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>';
+
+  const starSvg = '<svg width="13" height="13" viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:3px;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>';
+
+  const ticketSvg = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v2z"/></svg>';
+
+  function renderAll() {
+    const points = getUserPoints(user.id);
+    document.getElementById('pointsDisplay').textContent = formatPoints(points);
+
+    // Prizes
+    document.getElementById('prizesGrid').innerHTML = LOTTERY_PRIZES.map(p => {
+      const canAfford = points >= p.pointsCost;
+      const icon = prizeIcons[p.id] || defaultPrizeIcon;
+      return `
+        <div class="prize-card">
+          <span class="prize-icon">${icon}</span>
+          <div class="prize-name">${p.name}</div>
+          <div class="prize-desc">${p.description}</div>
+          <div class="prize-cost">${starSvg}${formatPoints(p.pointsCost)} pts</div>
+          <div class="prize-remaining">${p.remaining} draws remaining</div>
+          <button class="btn btn-primary" style="width:100%;" ${!canAfford ? 'disabled title="Not enough points"' : ''}
+            onclick="enterDraw('${p.id}','${p.name}',${p.pointsCost})">
+            ${canAfford ? ticketSvg + 'Enter Draw' : 'Need ' + formatPoints(p.pointsCost - points) + ' more pts'}
+          </button>
+        </div>
+      `;
+    }).join('');
+
+    // Points log
+    const log = getPointsLog(user.id);
+    const hist = document.getElementById('pointsHistory');
+    if (log.length === 0) {
+      hist.innerHTML = '<div style="padding:32px;text-align:center;color:var(--text-muted);">No points earned yet. Complete your first quiz!</div>';
+    } else {
+      hist.innerHTML = log.map(entry => {
+        const date = new Date(entry.date).toLocaleDateString();
+        return `
+          <div style="padding:14px 24px;border-bottom:1px solid var(--slate-200);display:flex;align-items:center;justify-content:space-between;gap:12px;">
+            <span style="font-size:14px;color:var(--text-muted);">${date}</span>
+            <span style="font-weight:600;color:var(--success);">+${entry.points} pts</span>
+            <span style="font-size:13px;color:var(--text-muted);">Total: ${formatPoints(entry.total)}</span>
+          </div>
+        `;
+      }).join('');
+    }
+  }
+
+  function enterDraw(prizeId, prizeName, cost) {
+    const current = getUserPoints(user.id);
+    if (current < cost) {
+      showToast('Not enough points!', 'error');
+      return;
+    }
+    deductUserPoints(user.id, cost);
+    showToast('You entered the draw for ' + prizeName + '! Good luck!', 'success');
+    renderAll();
+  }
+
+  window.enterDraw = enterDraw;
+  renderAll();
+</script>
+</body>
+</html>

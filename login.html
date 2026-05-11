@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - SkillQuest</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="navbar"></div>
+<div class="auth-page">
+  <div class="auth-card">
+    <div class="auth-header">
+      <div class="logo-icon">SQ</div>
+      <h1>Welcome Back</h1>
+      <p>Log in to continue your learning journey</p>
+    </div>
+    <div id="loginError" class="error-message"></div>
+    <form onsubmit="handleLogin(event)">
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <input type="email" class="form-input" id="loginEmail" placeholder="your@email.com" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input type="password" class="form-input" id="loginPassword" placeholder="Enter your password" required>
+      </div>
+      <button type="submit" class="btn btn-primary" style="width:100%;margin-top:8px;" id="loginBtn">Login</button>
+    </form>
+    <div class="auth-footer">
+      Don't have an account? <a href="signup.html">Sign Up</a>
+    </div>
+  </div>
+</div>
+<script src="js/api.js"></script>
+<script src="js/data.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/utils.js"></script>
+<script>
+  initPage();
+  // If already logged in, redirect
+  if (isLoggedIn()) {
+    const params = new URLSearchParams(window.location.search);
+    window.location.href = params.get('redirect') || 'dashboard.html';
+  }
+
+  async function handleLogin(e) {
+    e.preventDefault();
+    const email    = document.getElementById('loginEmail').value;
+    const password = document.getElementById('loginPassword').value;
+    const btn      = document.getElementById('loginBtn');
+    const errDiv   = document.getElementById('loginError');
+
+    btn.disabled    = true;
+    btn.textContent = 'Logging in...';
+
+    const result = await login(email, password);
+    if (result.success) {
+      showToast('Welcome back, ' + result.user.name + '!', 'success');
+      setTimeout(() => {
+        const params = new URLSearchParams(window.location.search);
+        window.location.href = params.get('redirect') || 'dashboard.html';
+      }, 500);
+    } else {
+      errDiv.textContent = result.error;
+      errDiv.className   = 'error-message show';
+      btn.disabled       = false;
+      btn.textContent    = 'Log in';
+    }
+  }
+</script>
+</body>
+</html>

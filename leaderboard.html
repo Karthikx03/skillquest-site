@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Leaderboard - SkillQuest</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="navbar"></div>
+<div class="nav-spacer"></div>
+
+<div class="page-header">
+  <div class="container">
+    <h1>Leaderboard</h1>
+    <p>See how you compare with other learners on SkillQuest</p>
+  </div>
+</div>
+
+<section class="section">
+  <div class="container" style="max-width:840px;">
+
+    <!-- User's own rank card -->
+    <div class="user-rank-card" id="myRankCard" style="display:none;">
+      <div>
+        <div class="rank-number" id="myRankNum">#1</div>
+        <div class="rank-label">Your rank</div>
+      </div>
+      <div style="flex:1;">
+        <div class="rank-name" id="myRankName"></div>
+        <div class="rank-points" id="myRankPoints"></div>
+      </div>
+      <div style="text-align:right;">
+        <a href="courses.html" class="btn" style="background:rgba(255,255,255,0.15);color:white;border:1px solid rgba(255,255,255,0.3);">Earn more points</a>
+      </div>
+    </div>
+
+    <!-- Filter tabs -->
+    <div class="filter-tabs" style="margin-bottom:24px;">
+      <button class="filter-tab active" onclick="setTab(this)">All time</button>
+      <button class="filter-tab" onclick="setTab(this)">This month</button>
+      <button class="filter-tab" onclick="setTab(this)">This week</button>
+    </div>
+
+    <!-- Table -->
+    <div class="leaderboard-table">
+      <div class="lb-row lb-header">
+        <div class="lb-rank">Rank</div>
+        <div class="lb-name">Learner</div>
+        <div class="lb-points">Points</div>
+        <div class="lb-courses">Courses</div>
+        <div></div>
+      </div>
+      <div id="leaderboardRows"></div>
+    </div>
+
+    <!-- Empty state shown only if no real users have earned points -->
+    <div id="emptyLeaderboard" style="display:none;text-align:center;padding:64px 24px;color:var(--text-muted);">
+      <div style="width:72px;height:72px;background:var(--slate-100);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--slate-400)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      </div>
+      <p style="font-size:18px;font-weight:800;color:var(--text-primary);margin-bottom:8px;">No scores on the board yet</p>
+      <p style="font-size:14px;max-width:320px;margin:0 auto 24px;line-height:1.65;">Complete your first quiz to put your name up here. It only takes a few minutes — pick any course to get started.</p>
+      <a href="courses.html" class="btn btn-primary">Start your first course</a>
+    </div>
+
+  </div>
+</section>
+
+<div id="footer"></div>
+<script src="js/api.js"></script>
+<script src="js/data.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/utils.js"></script>
+<script>
+  requireAuth();
+  initPage();
+
+  const user = getCurrentUser();
+
+  function setTab(btn) {
+    document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+  }
+
+  // Only real registered users (no fake seeded data)
+  const registeredUsers = getUsers().map(u => ({
+    id: u.id,
+    name: u.name,
+    points: getUserPoints(u.id),
+    coursesCompleted: getCoursesCompleted(u.id)
+  })).filter(u => u.points > 0 || u.coursesCompleted > 0);
+
+  registeredUsers.sort((a, b) => b.points - a.points || b.coursesCompleted - a.coursesCompleted);
+
+  const myIndex = registeredUsers.findIndex(u => u.id === user.id);
+  const myRank  = myIndex + 1;
+
+  if (user) {
+    const myData = registeredUsers[myIndex] || { points: 0, coursesCompleted: 0 };
+    document.getElementById('myRankCard').style.display = 'flex';
+    document.getElementById('myRankNum').textContent    = myRank ? '#' + myRank : '--';
+    document.getElementById('myRankName').textContent   = user.name;
+    document.getElementById('myRankPoints').textContent = formatPoints(myData.points) + ' points • ' + myData.coursesCompleted + ' courses completed';
+  }
+
+  if (registeredUsers.length === 0) {
+    document.getElementById('emptyLeaderboard').style.display = 'block';
+  } else {
+    const medalStyles = [
+      'background:#FFD700;color:#7a5c00;border:2px solid #e6b800;',
+      'background:#C0C8D0;color:#4a5568;border:2px solid #a0aab4;',
+      'background:#CD8B5A;color:#6b3a1f;border:2px solid #b47040;'
+    ];
+    document.getElementById('leaderboardRows').innerHTML = registeredUsers.map((u, i) => {
+      const isMe = user && u.id === user.id;
+      const rank  = i + 1;
+      let rankDisplay;
+      if (rank <= 3) rankDisplay = `<span style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;font-weight:800;font-size:14px;${medalStyles[rank-1]}">${rank}</span>`;
+      else           rankDisplay = `<span style="font-weight:700;color:var(--text-muted);">${rank}</span>`;
+
+      const starSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>';
+
+      return `
+        <div class="lb-row ${isMe ? 'lb-current' : ''}">
+          <div class="lb-rank">${rankDisplay}</div>
+          <div class="lb-name">${u.name}${isMe ? '<span class="you-badge">You</span>' : ''}</div>
+          <div class="lb-points">${starSvg}${formatPoints(u.points)}</div>
+          <div class="lb-courses">${u.coursesCompleted} courses</div>
+          <div></div>
+        </div>
+      `;
+    }).join('');
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Subject - SkillQuest</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    #subjectIcon svg { width: 64px; height: 64px; color: white; filter: drop-shadow(0 2px 8px rgba(0,0,0,0.2)); }
+    .subject-icon-wrap { display: flex; justify-content: center; margin-bottom: 20px; }
+
+    /* Video embed */
+    .video-section { margin: 0 0 48px; }
+    .video-section h2 { font-size: 22px; font-weight: 800; margin-bottom: 16px; }
+    .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.12); }
+    .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; border-radius: 16px; }
+
+    /* Course card cover image */
+    .course-cover-img { width: 100%; height: 180px; object-fit: cover; display: block; }
+    .course-cover-placeholder { width: 100%; height: 180px; background: linear-gradient(135deg, var(--slate-100), var(--slate-200)); display: flex; align-items: center; justify-content: center; }
+    .course-cover-placeholder svg { width: 48px; height: 48px; color: var(--slate-400); }
+  </style>
+</head>
+<body>
+<div id="navbar"></div>
+<div class="nav-spacer"></div>
+
+<div id="subjectHeader" class="page-header">
+  <div class="container">
+    <div class="breadcrumb" style="justify-content:center;">
+      <a href="courses.html">Courses</a>
+      <span>›</span>
+      <span id="breadSubject">Loading...</span>
+    </div>
+    <div class="subject-icon-wrap" id="subjectIcon"></div>
+    <h1 id="subjectTitle">Loading...</h1>
+    <p id="subjectDesc"></p>
+    <div style="display:flex;justify-content:center;gap:24px;margin-top:20px;flex-wrap:wrap;">
+      <span style="color:rgba(255,255,255,0.7);font-size:14px;" id="subjectCourseCount"></span>
+      <span style="color:rgba(255,255,255,0.7);font-size:14px;" id="subjectPoints"></span>
+    </div>
+  </div>
+</div>
+
+<section class="section">
+  <div class="container">
+    <div style="margin-bottom:28px;">
+      <a href="courses.html" class="btn btn-secondary btn-sm">&#8592; Back to All Subjects</a>
+    </div>
+
+    <!-- YouTube video embed -->
+    <div class="video-section" id="videoSection" style="display:none;">
+      <h2 id="videoSectionTitle">Recommended Video</h2>
+      <div class="video-wrapper">
+        <iframe id="videoFrame" src="" title="Subject introduction video" allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
+      </div>
+    </div>
+
+    <div class="courses-grid" id="coursesGrid"></div>
+  </div>
+</section>
+
+<div id="footer"></div>
+<script src="js/api.js"></script>
+<script src="js/data.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/utils.js"></script>
+<script>
+  requireAuth();
+  initPage();
+
+  const params = new URLSearchParams(window.location.search);
+  const subjectId = params.get('id');
+  const user = getCurrentUser();
+
+  const subject = SUBJECTS.find(s => s.id === subjectId);
+  if (!subject) {
+    document.getElementById('subjectTitle').textContent = 'Subject not found';
+  } else {
+    document.title = subject.title + ' - SkillQuest';
+    document.getElementById('breadSubject').textContent = subject.title;
+    document.getElementById('subjectIcon').innerHTML = subject.icon;
+    document.getElementById('subjectTitle').textContent = subject.title;
+    document.getElementById('subjectDesc').textContent = subject.description;
+    const totalPoints = subject.courses.reduce((sum, c) => sum + c.points, 0);
+    document.getElementById('subjectCourseCount').textContent = subject.courses.length + ' Courses';
+    document.getElementById('subjectPoints').textContent = totalPoints + ' Points Available';
+
+    // YouTube video embed
+    if (subject.videoId) {
+      const videoSection = document.getElementById('videoSection');
+      const videoFrame = document.getElementById('videoFrame');
+      const videoTitle = document.getElementById('videoSectionTitle');
+      videoSection.style.display = 'block';
+      videoFrame.src = 'https://www.youtube.com/embed/' + subject.videoId + '?rel=0&modestbranding=1';
+      if (subject.videoTitle) {
+        videoTitle.textContent = subject.videoTitle;
+        videoFrame.title = subject.videoTitle;
+      }
+    }
+
+    const grid = document.getElementById('coursesGrid');
+    const progress = user ? getProgress(user.id) : {};
+
+    const clockSvg = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:3px;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>';
+    const starSvg  = '<svg width="13" height="13" viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:3px;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>';
+    const bookSvg  = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:3px;"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>';
+    const helpSvg  = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:3px;"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>';
+    const checkSvg = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:3px;"><polyline points="20 6 9 17 4 12"/></svg>';
+
+    grid.innerHTML = subject.courses.map(course => {
+      const cp = getCourseProgress(user ? user.id : 'x', subjectId, course.id);
+      const lessonsTotal = course.lessons.length;
+      const lessonsDone = cp.lessonsCompleted.length;
+      const pct = lessonsTotal > 0 ? Math.round(lessonsDone / lessonsTotal * 100) : 0;
+      const isCompleted = cp.completed;
+      const hasStarted = lessonsDone > 0 || isCompleted;
+
+      let btnText = 'Start Course';
+      let btnClass = 'btn-primary';
+      if (isCompleted) { btnText = 'Completed'; btnClass = 'btn-teal'; }
+      else if (hasStarted) { btnText = 'Continue'; btnClass = 'btn-primary'; }
+
+      const diffColor = getDifficultyColor(course.difficulty);
+
+      const coverImg = course.coverImage
+        ? `<img class="course-cover-img" src="${course.coverImage}" alt="${course.title}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">`
+        : '';
+      const coverFallback = `<div class="course-cover-placeholder" ${course.coverImage ? 'style="display:none;"' : ''}>${subject.icon}</div>`;
+
+      return `
+        <div class="course-card">
+          ${coverImg}${coverFallback}
+          <div class="course-body">
+            <div class="course-meta">
+              <span class="badge" style="background:${diffColor}22;color:${diffColor};">${course.difficulty}</span>
+              <span class="badge badge-gray">${clockSvg}${course.duration}</span>
+              <span class="badge" style="background:#fef3c7;color:#92400e;">${starSvg}${course.points} pts</span>
+            </div>
+            <h3>${course.title}</h3>
+            <p>${course.description}</p>
+            ${hasStarted ? `
+              <div style="margin-bottom:14px;">
+                <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text-muted);margin-bottom:4px;">
+                  <span>${isCompleted ? checkSvg + 'Completed' : 'In progress'}</span>
+                  <span>${pct}%</span>
+                </div>
+                <div class="progress-bar"><div class="progress-fill${isCompleted ? ' green' : ''}" style="width:${pct}%"></div></div>
+              </div>` : ''}
+            <div class="course-footer">
+              <div class="course-info">
+                <span>${bookSvg}${lessonsTotal} lessons</span>
+                <span>${helpSvg}Quiz</span>
+              </div>
+              <a href="lesson.html?subject=${subjectId}&course=${course.id}&lesson=0" class="btn ${btnClass} btn-sm">${btnText}</a>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+</script>
+</body>
+</html>

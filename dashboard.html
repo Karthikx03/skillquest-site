@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - SkillQuest</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="navbar"></div>
+<div class="nav-spacer"></div>
+
+<div class="page-header">
+  <div class="container">
+    <h1 id="welcomeMsg">Welcome back</h1>
+    <p style="color:rgba(255,255,255,0.65);">Track your learning progress and achievements</p>
+  </div>
+</div>
+
+<section class="section">
+  <div class="container">
+    <!-- Stats -->
+    <div class="stats-grid" id="statsGrid"></div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px;" class="dashboard-grid">
+      <!-- Progress -->
+      <div>
+        <h2 style="font-size:20px;font-weight:700;margin-bottom:20px;">Subject progress</h2>
+        <div id="progressSection" style="background:white;border-radius:var(--radius-xl);border:1px solid var(--slate-200);box-shadow:var(--shadow-sm);overflow:hidden;"></div>
+      </div>
+      <!-- Recent Activity -->
+      <div>
+        <h2 style="font-size:20px;font-weight:700;margin-bottom:20px;">Recent activity</h2>
+        <div id="activitySection" style="background:white;border-radius:var(--radius-xl);border:1px solid var(--slate-200);box-shadow:var(--shadow-sm);overflow:hidden;"></div>
+      </div>
+    </div>
+
+    <!-- Certificates -->
+    <div style="margin-top:40px;" id="certSection"></div>
+
+    <!-- Quick links -->
+    <div style="margin-top:40px;">
+      <h2 style="font-size:20px;font-weight:700;margin-bottom:20px;">Quick links</h2>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;">
+        <a href="courses.html" class="card" style="padding:20px;text-align:center;text-decoration:none;">
+          <div class="quick-link-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
+          </div>
+          <div style="font-weight:700;margin-bottom:4px;">Continue learning</div>
+          <div style="font-size:13px;color:var(--text-muted);">Pick up where you left off</div>
+        </a>
+        <a href="leaderboard.html" class="card" style="padding:20px;text-align:center;text-decoration:none;">
+          <div class="quick-link-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 010-5H6"/><path d="M18 9h1.5a2.5 2.5 0 000-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17a2 2 0 002 2h0a2 2 0 002-2v-2.34"/><path d="M6 4h12v6a6 6 0 01-12 0V4z"/></svg>
+          </div>
+          <div style="font-weight:700;margin-bottom:4px;">Leaderboard</div>
+          <div style="font-size:13px;color:var(--text-muted);">See how you rank</div>
+        </a>
+        <a href="rewards.html" class="card" style="padding:20px;text-align:center;text-decoration:none;">
+          <div class="quick-link-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z"/></svg>
+          </div>
+          <div style="font-weight:700;margin-bottom:4px;">Rewards</div>
+          <div style="font-size:13px;color:var(--text-muted);">Redeem your points</div>
+        </a>
+        <a href="contact.html" class="card" style="padding:20px;text-align:center;text-decoration:none;">
+          <div class="quick-link-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          </div>
+          <div style="font-weight:700;margin-bottom:4px;">Contact us</div>
+          <div style="font-size:13px;color:var(--text-muted);">Send feedback or questions</div>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div id="footer"></div>
+<script src="js/api.js"></script>
+<script src="js/data.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/utils.js"></script>
+<script>
+  requireAuth();
+  initPage();
+
+  const user = getCurrentUser();
+  document.getElementById('welcomeMsg').textContent = 'Hi, ' + user.name.split(' ')[0];
+
+  const points    = getUserPoints(user.id);
+  const completed = getCoursesCompleted(user.id);
+  const started   = getSubjectsStarted(user.id);
+
+  const allUsers = [...MOCK_LEADERBOARD_USERS, ...getUsers().map(u => ({ id:u.id, name:u.name, points:getUserPoints(u.id), coursesCompleted:getCoursesCompleted(u.id) }))];
+  allUsers.sort((a, b) => b.points - a.points);
+  const myRank = allUsers.findIndex(u => u.id === user.id) + 1;
+
+  const starSvg   = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>';
+  const checkSvg  = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>';
+  const bookSvg   = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>';
+  const trophySvg = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 010-5H6"/><path d="M18 9h1.5a2.5 2.5 0 000-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17a2 2 0 002 2h0a2 2 0 002-2v-2.34"/><path d="M6 4h12v6a6 6 0 01-12 0V4z"/></svg>';
+
+  document.getElementById('statsGrid').innerHTML = `
+    <div class="stat-card">
+      <div class="stat-icon" style="background:rgba(245,158,11,0.1);">${starSvg}</div>
+      <div><div class="stat-value">${formatPoints(points)}</div><div class="stat-label">Total points</div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background:rgba(16,185,129,0.1);">${checkSvg}</div>
+      <div><div class="stat-value">${completed}</div><div class="stat-label">Courses completed</div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background:rgba(37,99,235,0.1);">${bookSvg}</div>
+      <div><div class="stat-value">${started}</div><div class="stat-label">Subjects started</div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background:rgba(124,58,237,0.1);">${trophySvg}</div>
+      <div><div class="stat-value">${myRank > 0 ? '#' + myRank : '--'}</div><div class="stat-label">Your rank</div></div>
+    </div>
+  `;
+
+  const progress = getProgress(user.id);
+  const progressSection = document.getElementById('progressSection');
+  const subjectsWithProgress = SUBJECTS.filter(s => progress[s.id] && Object.keys(progress[s.id]).length > 0);
+
+  if (subjectsWithProgress.length === 0) {
+    progressSection.innerHTML = `<div style="padding:32px;text-align:center;color:var(--text-muted);">
+      <p style="margin-bottom:12px;font-size:15px;">You have not started any courses yet.</p>
+      <a href="courses.html" class="btn btn-primary btn-sm">Browse courses</a>
+    </div>`;
+  } else {
+    progressSection.innerHTML = subjectsWithProgress.map(s => {
+      const sp   = progress[s.id] || {};
+      const done = Object.values(sp).filter(c => c.completed).length;
+      const pct  = Math.round(done / s.courses.length * 100);
+      return `
+        <div style="padding:16px 20px;border-bottom:1px solid var(--slate-200);">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">
+            <div style="flex:1;">
+              <div style="display:flex;justify-content:space-between;align-items:center;">
+                <span style="font-weight:600;font-size:14px;">${s.title}</span>
+                <span style="font-size:13px;color:var(--text-muted);">${done} / ${s.courses.length}</span>
+              </div>
+              <div class="progress-bar" style="margin-top:6px;height:6px;">
+                <div class="progress-fill" style="width:${pct}%;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  const activitySection = document.getElementById('activitySection');
+  const recentActivity  = getRecentActivity(user.id);
+  if (recentActivity.length === 0) {
+    activitySection.innerHTML = `<div style="padding:32px;text-align:center;color:var(--text-muted);">
+      <p style="font-size:15px;">No activity yet. Complete a quiz to get started.</p>
+    </div>`;
+  } else {
+    activitySection.innerHTML = recentActivity.slice(0, 6).map(a => {
+      const subj = typeof SUBJECTS !== 'undefined' ? SUBJECTS.find(s => s.id === a.subjectId) : null;
+      const course = subj ? subj.courses.find(c => c.id === a.courseId) : null;
+      const pct  = Math.round((a.score / (a.totalQuestions || 5)) * 100);
+      return `
+        <div style="padding:14px 20px;border-bottom:1px solid var(--slate-200);display:flex;align-items:center;gap:12px;">
+          <div style="flex:1;">
+            <div style="font-weight:600;font-size:14px;">${course ? course.title : a.courseId}</div>
+            <div style="font-size:13px;color:var(--text-muted);">${subj ? subj.title : a.subjectId} &bull; ${pct}% score</div>
+          </div>
+          <div style="font-size:14px;font-weight:700;color:var(--amber);">+${a.points} pts</div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  const certSection = document.getElementById('certSection');
+  const certs = [];
+  const prog = getProgress(user.id);
+  for (const sid in prog) {
+    for (const cid in prog[sid]) {
+      const cp = prog[sid][cid];
+      if (cp.completed && cp.quizScore !== null) {
+        const pct = Math.round((cp.quizScore / (cp.totalQuestions || 5)) * 100);
+        if (pct >= 80) {
+          const subj = typeof SUBJECTS !== 'undefined' ? SUBJECTS.find(s => s.id === sid) : null;
+          const course = subj ? subj.courses.find(c => c.id === cid) : null;
+          if (course) certs.push({ subject: subj, course, pct, sid, cid });
+        }
+      }
+    }
+  }
+  if (certs.length > 0) {
+    certSection.innerHTML = `<h2 style="font-size:20px;font-weight:700;margin-bottom:20px;">Your certificates</h2>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;">
+        ${certs.map(c => `
+          <div class="card" style="padding:20px;display:flex;align-items:center;gap:14px;">
+            <div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--indigo));display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
+            </div>
+            <div style="flex:1;min-width:0;">
+              <div style="font-weight:700;font-size:14px;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${c.course.title}</div>
+              <div style="font-size:12px;color:var(--text-muted);">${c.subject.title} &bull; Score: ${c.pct}%</div>
+            </div>
+            <a href="certificate.html?subject=${c.sid}&course=${c.cid}" class="btn btn-primary btn-sm">View</a>
+          </div>
+        `).join('')}
+      </div>`;
+  }
+</script>
+</body>
+</html>
