@@ -4,3 +4,15 @@ node_modules/
 *.command
 dist/
 build/
+
+# Legacy database files
+*.db
+*.sqlite
+
+# Logs
+*.log
+npm-debug.log*
+
+# Editor configs
+.vscode/
+.idea/

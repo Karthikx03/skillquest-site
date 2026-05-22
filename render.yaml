@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: skillquest
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: JWT_SECRET
+        generateValue: true       # Render auto-generates a secure random value
+      - key: ADMIN_PASSWORD
+        sync: false               # You set this manually in the Render dashboard
+      - key: DATABASE_URL
+        sync: false               # Set this to your Supabase / Render PostgreSQL URL
+    autoDeploy: true
+    healthCheckPath: /api/stats

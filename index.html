@@ -180,16 +180,16 @@
     <p class="hero-subtitle">SkillQuest is a free, gamified platform for students who want to get ahead. Earn points, beat quizzes, and build knowledge that translates to real life — not just exams.</p>
     <div class="hero-stats">
       <div class="hero-stat">
-        <span class="hero-stat-num">24</span>
+        <span class="hero-stat-num">36</span>
         <span class="hero-stat-label">Free courses</span>
+      </div>
+      <div class="hero-stat">
+        <span class="hero-stat-num" id="heroUserCount">—</span>
+        <span class="hero-stat-label">Learners joined</span>
       </div>
       <div class="hero-stat">
         <span class="hero-stat-num">6</span>
         <span class="hero-stat-label">Subject areas</span>
-      </div>
-      <div class="hero-stat">
-        <span class="hero-stat-num">80%</span>
-        <span class="hero-stat-label">Pass rate for cert.</span>
       </div>
       <div class="hero-stat">
         <span class="hero-stat-num">$0</span>
@@ -339,7 +339,7 @@
       <div class="step-card">
         <div class="step-num">2</div>
         <h3>Pick what interests you</h3>
-        <p>Browse 6 subjects and 24 courses. Start anywhere — there is no required order or prerequisite.</p>
+        <p>Browse 6 subjects and 36 courses. Start anywhere — there is no required order or prerequisite.</p>
       </div>
       <div class="step-card">
         <div class="step-num">3</div>
@@ -430,7 +430,7 @@
       <span style="color:rgba(255,255,255,0.75);font-size:13px;font-weight:600;">No credit card. No trial period. Free from day one.</span>
     </div>
     <h2 style="color:white;font-size:clamp(28px,4vw,44px);font-weight:800;margin-bottom:12px;letter-spacing:-1px;">Pick a course and start today</h2>
-    <p style="color:rgba(255,255,255,0.6);font-size:17px;max-width:480px;margin:0 auto 32px;line-height:1.7;">24 courses, 6 subjects, certificates included. You can be through your first lesson in under 20 minutes.</p>
+    <p style="color:rgba(255,255,255,0.6);font-size:17px;max-width:480px;margin:0 auto 32px;line-height:1.7;">36 courses, 6 subjects, certificates included. You can be through your first lesson in under 20 minutes.</p>
     <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
       <a href="signup.html" class="btn btn-primary btn-xl">Create your free account</a>
       <a href="courses.html" class="btn btn-outline btn-xl" style="color:white;border-color:rgba(255,255,255,0.4);background:rgba(255,255,255,0.08);">Browse all courses</a>
@@ -484,6 +484,28 @@
 <script src="js/data.js"></script>
 <script src="js/auth.js"></script>
 <script src="js/utils.js"></script>
-<script>initPage();</script>
+<script>
+  initPage();
+
+  // Pull live learner count from the public stats endpoint
+  (function loadLiveStats() {
+    const el = document.getElementById('heroUserCount');
+    if (!el) return;
+    const base = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+      ? 'http://localhost:3000' : '';
+    fetch(base + '/api/stats')
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (data && data.totalUsers != null) {
+          el.textContent = data.totalUsers >= 1000
+            ? (data.totalUsers / 1000).toFixed(1).replace(/\.0$/, '') + 'k'
+            : String(data.totalUsers);
+        } else {
+          el.textContent = '—';
+        }
+      })
+      .catch(() => { el.textContent = '—'; });
+  })();
+</script>
 </body>
 </html>

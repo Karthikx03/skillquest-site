@@ -14,7 +14,7 @@
 <div class="page-header">
   <div class="container">
     <h1>Leaderboard</h1>
-    <p>See how you compare with other learners on SkillQuest</p>
+    <p>See how you rank against every learner on SkillQuest — scores update in real time</p>
   </div>
 </div>
 
@@ -38,13 +38,19 @@
 
     <!-- Filter tabs -->
     <div class="filter-tabs" style="margin-bottom:24px;">
-      <button class="filter-tab active" onclick="setTab(this)">All time</button>
-      <button class="filter-tab" onclick="setTab(this)">This month</button>
-      <button class="filter-tab" onclick="setTab(this)">This week</button>
+      <button class="filter-tab active" onclick="setTab(this,'all')">All time</button>
+      <button class="filter-tab" onclick="setTab(this,'month')">This month</button>
+      <button class="filter-tab" onclick="setTab(this,'week')">This week</button>
+    </div>
+
+    <!-- Loading state -->
+    <div id="lbLoading" style="text-align:center;padding:48px 0;color:var(--text-muted);">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--slate-400)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation:spin 1s linear infinite;display:inline-block;margin-bottom:12px;"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+      <p style="font-size:14px;">Loading leaderboard...</p>
     </div>
 
     <!-- Table -->
-    <div class="leaderboard-table">
+    <div class="leaderboard-table" id="lbTable" style="display:none;">
       <div class="lb-row lb-header">
         <div class="lb-rank">Rank</div>
         <div class="lb-name">Learner</div>
@@ -55,7 +61,7 @@
       <div id="leaderboardRows"></div>
     </div>
 
-    <!-- Empty state shown only if no real users have earned points -->
+    <!-- Empty state -->
     <div id="emptyLeaderboard" style="display:none;text-align:center;padding:64px 24px;color:var(--text-muted);">
       <div style="width:72px;height:72px;background:var(--slate-100);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">
         <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--slate-400)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
@@ -68,9 +74,13 @@
   </div>
 </section>
 
+<style>
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+
 <div id="footer"></div>
 <script src="js/api.js"></script>
-  <script src="js/seed.js"></script>
+<script src="js/seed.js"></script>
 <script src="js/data.js"></script>
 <script src="js/auth.js"></script>
 <script src="js/utils.js"></script>
@@ -79,61 +89,113 @@
   initPage();
 
   const user = getCurrentUser();
+  const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+    ? 'http://localhost:3000' : '';
 
-  function setTab(btn) {
+  const medalStyles = [
+    'background:#FFD700;color:#7a5c00;border:2px solid #e6b800;',
+    'background:#C0C8D0;color:#4a5568;border:2px solid #a0aab4;',
+    'background:#CD8B5A;color:#6b3a1f;border:2px solid #b47040;'
+  ];
+
+  const starSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>';
+
+  let currentTab = 'all';
+
+  function setTab(btn, tab) {
     document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
     btn.classList.add('active');
+    currentTab = tab;
+    loadLeaderboard();
   }
 
-  // Only real registered users (no fake seeded data)
-  const registeredUsers = getUsers().map(u => ({
-    id: u.id,
-    name: u.name,
-    points: getUserPoints(u.id),
-    coursesCompleted: getCoursesCompleted(u.id)
-  })).filter(u => u.points > 0 || u.coursesCompleted > 0);
+  function renderRows(entries) {
+    const loading = document.getElementById('lbLoading');
+    const table   = document.getElementById('lbTable');
+    const empty   = document.getElementById('emptyLeaderboard');
+    const myCard  = document.getElementById('myRankCard');
 
-  registeredUsers.sort((a, b) => b.points - a.points || b.coursesCompleted - a.coursesCompleted);
+    loading.style.display = 'none';
 
-  const myIndex = registeredUsers.findIndex(u => u.id === user.id);
-  const myRank  = myIndex + 1;
+    const active = entries.filter(u => u.points > 0 || u.coursesCompleted > 0);
 
-  if (user) {
-    const myData = registeredUsers[myIndex] || { points: 0, coursesCompleted: 0 };
-    document.getElementById('myRankCard').style.display = 'flex';
-    document.getElementById('myRankNum').textContent    = myRank ? '#' + myRank : '--';
-    document.getElementById('myRankName').textContent   = user.name;
-    document.getElementById('myRankPoints').textContent = formatPoints(myData.points) + ' points • ' + myData.coursesCompleted + ' courses completed';
-  }
+    if (!active.length) {
+      table.style.display = 'none';
+      empty.style.display = 'block';
+      myCard.style.display = 'none';
+      return;
+    }
 
-  if (registeredUsers.length === 0) {
-    document.getElementById('emptyLeaderboard').style.display = 'block';
-  } else {
-    const medalStyles = [
-      'background:#FFD700;color:#7a5c00;border:2px solid #e6b800;',
-      'background:#C0C8D0;color:#4a5568;border:2px solid #a0aab4;',
-      'background:#CD8B5A;color:#6b3a1f;border:2px solid #b47040;'
-    ];
-    document.getElementById('leaderboardRows').innerHTML = registeredUsers.map((u, i) => {
+    table.style.display = 'block';
+    empty.style.display = 'none';
+
+    const myIndex = active.findIndex(u => user && u.id === user.id);
+    const myRank  = myIndex + 1;
+
+    if (user) {
+      const myData = active[myIndex] || { points: 0, coursesCompleted: 0 };
+      myCard.style.display = 'flex';
+      document.getElementById('myRankNum').textContent    = myRank ? '#' + myRank : '--';
+      document.getElementById('myRankName').textContent   = user.name;
+      document.getElementById('myRankPoints').textContent =
+        formatPoints(myData.points) + ' points • ' + (myData.coursesCompleted || 0) + ' courses completed';
+    }
+
+    document.getElementById('leaderboardRows').innerHTML = active.map((u, i) => {
       const isMe = user && u.id === user.id;
       const rank  = i + 1;
-      let rankDisplay;
-      if (rank <= 3) rankDisplay = `<span style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;font-weight:800;font-size:14px;${medalStyles[rank-1]}">${rank}</span>`;
-      else           rankDisplay = `<span style="font-weight:700;color:var(--text-muted);">${rank}</span>`;
-
-      const starSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>';
+      const rankDisplay = rank <= 3
+        ? `<span style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;font-weight:800;font-size:14px;${medalStyles[rank-1]}">${rank}</span>`
+        : `<span style="font-weight:700;color:var(--text-muted);">${rank}</span>`;
 
       return `
         <div class="lb-row ${isMe ? 'lb-current' : ''}">
           <div class="lb-rank">${rankDisplay}</div>
-          <div class="lb-name">${u.name}${isMe ? '<span class="you-badge">You</span>' : ''}</div>
-          <div class="lb-points">${starSvg}${formatPoints(u.points)}</div>
-          <div class="lb-courses">${u.coursesCompleted} courses</div>
+          <div class="lb-name">${escHtml(u.name)}${isMe ? '<span class="you-badge">You</span>' : ''}</div>
+          <div class="lb-points">${starSvg}${formatPoints(u.points || 0)}</div>
+          <div class="lb-courses">${u.coursesCompleted || 0} courses</div>
           <div></div>
         </div>
       `;
     }).join('');
   }
+
+  function escHtml(str) {
+    return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  async function loadLeaderboard() {
+    document.getElementById('lbLoading').style.display = 'block';
+    document.getElementById('lbTable').style.display = 'none';
+    document.getElementById('emptyLeaderboard').style.display = 'none';
+
+    // Try backend first — it has accurate cross-device data
+    const token = typeof getToken === 'function' ? getToken() : null;
+    if (token) {
+      try {
+        const url = API_BASE + '/api/leaderboard';
+        const res = await fetch(url, { headers: { Authorization: 'Bearer ' + token } });
+        if (res.ok) {
+          const data = await res.json();
+          // data is an array: [{id, name, points, coursesCompleted}]
+          renderRows(data);
+          return;
+        }
+      } catch (_) { /* fall through to localStorage */ }
+    }
+
+    // Fallback: use local storage data (works offline / before backend is deployed)
+    const localUsers = (typeof getUsers === 'function' ? getUsers() : []).map(u => ({
+      id: u.id,
+      name: u.name,
+      points: typeof getUserPoints === 'function' ? getUserPoints(u.id) : 0,
+      coursesCompleted: typeof getCoursesCompleted === 'function' ? getCoursesCompleted(u.id) : 0
+    }));
+    localUsers.sort((a, b) => (b.points - a.points) || (b.coursesCompleted - a.coursesCompleted));
+    renderRows(localUsers);
+  }
+
+  loadLeaderboard();
 </script>
 </body>
 </html>

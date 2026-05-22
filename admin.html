@@ -1,0 +1,1671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — SkillQuest</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --dark-900: #0f172a;
+      --dark-800: #1e293b;
+      --dark-700: #334155;
+      --slate-600: #475569;
+      --slate-400: #94a3b8;
+      --slate-300: #cbd5e1;
+      --slate-200: #e2e8f0;
+      --slate-100: #f1f5f9;
+      --body-bg: #f8fafc;
+      --white: #ffffff;
+      --text-primary: #0f172a;
+      --text-muted: #64748b;
+      --success: #10b981;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --indigo: #4f46e5;
+      --radius: 12px;
+      --radius-lg: 16px;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+      --shadow: 0 4px 16px rgba(0,0,0,0.08);
+      --shadow-md: 0 8px 24px rgba(0,0,0,0.1);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: var(--body-bg);
+      color: var(--text-primary);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a { text-decoration: none; color: inherit; }
+
+    /* ─── LOGIN SCREEN ─────────────────────────────────────── */
+    #loginScreen {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f2d5c 100%);
+      padding: 24px;
+    }
+
+    .login-card {
+      background: white;
+      border-radius: 20px;
+      padding: 48px 40px;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.25);
+    }
+
+    .login-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 32px;
+    }
+
+    .login-logo-mark {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #2563eb, #7c3aed);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 800;
+      color: white;
+      letter-spacing: -0.5px;
+      flex-shrink: 0;
+    }
+
+    .login-logo-text {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--text-primary);
+      letter-spacing: -0.5px;
+    }
+
+    .login-logo-text span {
+      color: var(--primary);
+    }
+
+    .login-card h1 {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+      letter-spacing: -0.5px;
+    }
+
+    .login-card p {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 28px;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 7px;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 11px 14px;
+      border: 1.5px solid var(--slate-200);
+      border-radius: var(--radius);
+      font-family: inherit;
+      font-size: 14px;
+      color: var(--text-primary);
+      background: var(--slate-100);
+      outline: none;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .form-input:focus {
+      border-color: var(--primary);
+      background: white;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 11px 20px;
+      border-radius: var(--radius);
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-primary:hover { background: var(--primary-dark); }
+
+    .btn-outline {
+      background: transparent;
+      border: 1.5px solid var(--slate-200);
+      color: var(--text-primary);
+    }
+
+    .btn-outline:hover { border-color: var(--slate-400); background: var(--slate-100); }
+
+    .btn-danger { background: var(--danger); color: white; }
+    .btn-danger:hover { background: #dc2626; }
+
+    .btn-success { background: var(--success); color: white; }
+    .btn-success:hover { background: #059669; }
+
+    .btn-full { width: 100%; }
+
+    .login-error {
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      color: #991b1b;
+      border-radius: var(--radius);
+      padding: 10px 14px;
+      font-size: 13px;
+      margin-bottom: 16px;
+      display: none;
+    }
+
+    /* ─── ADMIN SHELL ─────────────────────────────────────── */
+    #adminShell { display: none; min-height: 100vh; }
+
+    .admin-sidebar {
+      width: 240px;
+      background: var(--dark-900);
+      color: white;
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      z-index: 100;
+    }
+
+    .sidebar-logo {
+      padding: 20px 20px 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .sidebar-logo-mark {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #2563eb, #7c3aed);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 800;
+      color: white;
+      flex-shrink: 0;
+    }
+
+    .sidebar-logo-text {
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+
+    .sidebar-logo-sub {
+      font-size: 10px;
+      font-weight: 500;
+      opacity: 0.45;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .sidebar-nav {
+      padding: 12px 10px;
+      flex: 1;
+    }
+
+    .nav-section-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.35);
+      padding: 12px 10px 6px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 12px;
+      border-radius: 8px;
+      font-size: 13.5px;
+      font-weight: 500;
+      color: rgba(255,255,255,0.65);
+      cursor: pointer;
+      transition: all 0.15s;
+      margin-bottom: 2px;
+      border: none;
+      background: transparent;
+      width: 100%;
+      text-align: left;
+    }
+
+    .nav-item:hover {
+      background: rgba(255,255,255,0.07);
+      color: rgba(255,255,255,0.9);
+    }
+
+    .nav-item.active {
+      background: rgba(37,99,235,0.25);
+      color: #93c5fd;
+    }
+
+    .nav-item svg { flex-shrink: 0; opacity: 0.8; }
+
+    .sidebar-footer {
+      padding: 16px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .admin-badge {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 10px;
+      margin-bottom: 10px;
+    }
+
+    .admin-avatar {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, #2563eb, #7c3aed);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      color: white;
+    }
+
+    .admin-name { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.9); }
+    .admin-role { font-size: 11px; color: rgba(255,255,255,0.4); }
+
+    .btn-logout {
+      width: 100%;
+      padding: 8px;
+      border-radius: 8px;
+      background: rgba(239,68,68,0.1);
+      border: 1px solid rgba(239,68,68,0.2);
+      color: #f87171;
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.2s;
+    }
+
+    .btn-logout:hover {
+      background: rgba(239,68,68,0.2);
+      border-color: rgba(239,68,68,0.4);
+    }
+
+    /* ─── MAIN CONTENT ─────────────────────────────────────── */
+    .admin-main {
+      margin-left: 240px;
+      min-height: 100vh;
+    }
+
+    .admin-topbar {
+      background: white;
+      border-bottom: 1px solid var(--slate-200);
+      padding: 0 28px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .topbar-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .topbar-actions { display: flex; align-items: center; gap: 12px; }
+
+    .last-refresh {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .admin-content { padding: 28px; }
+
+    /* ─── PAGES (tabs) ─────────────────────────────────────── */
+    .admin-page { display: none; }
+    .admin-page.active { display: block; }
+
+    /* ─── STAT CARDS ─────────────────────────────────────── */
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .stat-card {
+      background: white;
+      border-radius: var(--radius-lg);
+      padding: 22px 24px;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--slate-200);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .stat-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .stat-card-label {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .stat-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .stat-value {
+      font-size: 30px;
+      font-weight: 800;
+      color: var(--text-primary);
+      letter-spacing: -1px;
+      line-height: 1;
+    }
+
+    .stat-sub {
+      font-size: 12.5px;
+      color: var(--text-muted);
+    }
+
+    /* ─── CARDS / PANELS ─────────────────────────────────────── */
+    .panel {
+      background: white;
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--slate-200);
+      overflow: hidden;
+    }
+
+    .panel-header {
+      padding: 18px 22px;
+      border-bottom: 1px solid var(--slate-200);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .panel-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .panel-subtitle {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* ─── TABLE ─────────────────────────────────────── */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .data-table th {
+      padding: 11px 16px;
+      text-align: left;
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid var(--slate-200);
+      background: var(--slate-100);
+      white-space: nowrap;
+    }
+
+    .data-table td {
+      padding: 13px 16px;
+      font-size: 13.5px;
+      color: var(--text-primary);
+      border-bottom: 1px solid var(--slate-200);
+      vertical-align: middle;
+    }
+
+    .data-table tr:last-child td { border-bottom: none; }
+
+    .data-table tbody tr:hover { background: var(--slate-100); }
+
+    .user-cell {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .user-avatar-sm {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      color: white;
+      flex-shrink: 0;
+    }
+
+    .user-name { font-weight: 600; font-size: 13.5px; }
+    .user-email { font-size: 12px; color: var(--text-muted); }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 11.5px;
+      font-weight: 700;
+    }
+
+    .badge-green { background: #d1fae5; color: #065f46; }
+    .badge-blue  { background: #dbeafe; color: #1e40af; }
+    .badge-amber { background: #fef3c7; color: #92400e; }
+    .badge-gray  { background: var(--slate-200); color: var(--slate-600); }
+    .badge-red   { background: #fee2e2; color: #991b1b; }
+
+    .rank-medal {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    /* ─── SEARCH / FILTER BAR ─────────────────────────────── */
+    .table-toolbar {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--slate-200);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      background: white;
+    }
+
+    .search-input-wrap {
+      position: relative;
+      flex: 1;
+      min-width: 200px;
+      max-width: 320px;
+    }
+
+    .search-icon-abs {
+      position: absolute;
+      left: 11px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--slate-400);
+      pointer-events: none;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 8px 12px 8px 36px;
+      border: 1.5px solid var(--slate-200);
+      border-radius: 9px;
+      font-family: inherit;
+      font-size: 13.5px;
+      outline: none;
+      background: var(--slate-100);
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .search-input:focus {
+      border-color: var(--primary);
+      background: white;
+    }
+
+    .sort-select {
+      padding: 8px 12px;
+      border: 1.5px solid var(--slate-200);
+      border-radius: 9px;
+      font-family: inherit;
+      font-size: 13.5px;
+      outline: none;
+      background: var(--slate-100);
+      color: var(--text-primary);
+      cursor: pointer;
+    }
+
+    /* ─── EMPTY STATE ─────────────────────────────────────── */
+    .empty-state {
+      text-align: center;
+      padding: 56px 24px;
+      color: var(--text-muted);
+    }
+
+    .empty-icon {
+      width: 56px;
+      height: 56px;
+      background: var(--slate-100);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+    }
+
+    .empty-state h3 {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+    }
+
+    .empty-state p {
+      font-size: 13.5px;
+      max-width: 280px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    /* ─── LOADING SPINNER ─────────────────────────────────── */
+    .spinner {
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      border: 2.5px solid rgba(255,255,255,0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ─── TOAST ─────────────────────────────────────────────── */
+    #toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--dark-900);
+      color: white;
+      padding: 12px 18px;
+      border-radius: 10px;
+      font-size: 13.5px;
+      font-weight: 500;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+      z-index: 9999;
+      transform: translateY(80px);
+      opacity: 0;
+      transition: all 0.3s ease;
+      max-width: 320px;
+    }
+
+    #toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    /* ─── CHART BARS ─────────────────────────────────────────── */
+    .bar-chart { padding: 20px 24px; }
+
+    .bar-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .bar-label {
+      width: 130px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-primary);
+      flex-shrink: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .bar-track {
+      flex: 1;
+      background: var(--slate-100);
+      border-radius: 6px;
+      height: 10px;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      border-radius: 6px;
+      transition: width 0.6s ease;
+    }
+
+    .bar-val {
+      width: 40px;
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    /* ─── TWO-COL GRID ─────────────────────────────────────── */
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+    @media (max-width: 900px) {
+      .admin-sidebar { display: none; }
+      .admin-main { margin-left: 0; }
+      .two-col { grid-template-columns: 1fr; }
+    }
+
+    /* ─── MESSAGES ─────────────────────────────────────────── */
+    .message-card {
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--slate-200);
+    }
+
+    .message-card:last-child { border-bottom: none; }
+
+    .message-meta {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+    }
+
+    .message-from { font-size: 13.5px; font-weight: 700; color: var(--text-primary); }
+    .message-email { font-size: 12.5px; color: var(--text-muted); }
+    .message-date { font-size: 12px; color: var(--slate-400); margin-left: auto; }
+
+    .message-subject {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--primary);
+      margin-bottom: 6px;
+    }
+
+    .message-body {
+      font-size: 13.5px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* ─── PAGINATION ─────────────────────────────────────────── */
+    .pagination {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 20px;
+      border-top: 1px solid var(--slate-200);
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .page-btns { display: flex; gap: 6px; }
+
+    .page-btn {
+      padding: 5px 10px;
+      border: 1.5px solid var(--slate-200);
+      border-radius: 8px;
+      background: white;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      color: var(--text-primary);
+      transition: all 0.15s;
+    }
+
+    .page-btn:hover:not(:disabled) { border-color: var(--primary); color: var(--primary); }
+    .page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .page-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+  </style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════════
+     LOGIN SCREEN
+════════════════════════════════════════════════ -->
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="login-logo-mark">SQ</div>
+      <div>
+        <div class="login-logo-text">Skill<span>Quest</span></div>
+      </div>
+    </div>
+
+    <h1>Admin Dashboard</h1>
+    <p>Sign in to access platform analytics and user data.</p>
+
+    <div class="login-error" id="loginError"></div>
+
+    <div class="form-group">
+      <label for="adminEmail">Admin Email</label>
+      <input type="email" id="adminEmail" class="form-input" placeholder="admin@skillquest.tw" autocomplete="username">
+    </div>
+
+    <div class="form-group">
+      <label for="adminPass">Admin Password</label>
+      <input type="password" id="adminPass" class="form-input" placeholder="Enter admin password" autocomplete="current-password">
+    </div>
+
+    <button class="btn btn-primary btn-full" id="loginBtn" onclick="doLogin()">
+      Sign in
+    </button>
+
+    <p style="margin-top:20px;font-size:12.5px;color:var(--text-muted);text-align:center;">
+      This area is restricted to platform administrators.
+    </p>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════
+     ADMIN SHELL
+════════════════════════════════════════════════ -->
+<div id="adminShell">
+
+  <!-- SIDEBAR -->
+  <aside class="admin-sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-mark">SQ</div>
+      <div>
+        <div class="sidebar-logo-text">SkillQuest</div>
+        <div class="sidebar-logo-sub">Admin Panel</div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Overview</div>
+      <button class="nav-item active" onclick="showPage('overview', this)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Overview
+      </button>
+
+      <div class="nav-section-label" style="margin-top:8px;">Data</div>
+      <button class="nav-item" onclick="showPage('users', this)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Registered Users
+      </button>
+      <button class="nav-item" onclick="showPage('leaderboard', this)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        Leaderboard
+      </button>
+      <button class="nav-item" onclick="showPage('messages', this)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        Contact Messages
+      </button>
+
+      <div class="nav-section-label" style="margin-top:8px;">Tools</div>
+      <button class="nav-item" onclick="exportCSV()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Export CSV
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="admin-badge">
+        <div class="admin-avatar">A</div>
+        <div>
+          <div class="admin-name">Administrator</div>
+          <div class="admin-role">Full access</div>
+        </div>
+      </div>
+      <button class="btn-logout" onclick="doLogout()">Sign out</button>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="admin-main">
+
+    <!-- TOP BAR -->
+    <div class="admin-topbar">
+      <div id="topbarTitle" class="topbar-title">Overview</div>
+      <div class="topbar-actions">
+        <span class="last-refresh" id="lastRefresh"></span>
+        <button class="btn btn-outline" onclick="refreshAll()" style="padding:7px 14px;font-size:13px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+          Refresh
+        </button>
+        <button class="btn btn-success" onclick="exportCSV()" style="padding:7px 14px;font-size:13px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Export CSV
+        </button>
+      </div>
+    </div>
+
+    <div class="admin-content">
+
+      <!-- ═══════════════════════════
+           PAGE: OVERVIEW
+      ═══════════════════════════ -->
+      <div class="admin-page active" id="page-overview">
+
+        <!-- Stat cards -->
+        <div class="stat-grid" id="statGrid">
+          <div class="stat-card">
+            <div class="stat-card-header">
+              <span class="stat-card-label">Total Users</span>
+              <div class="stat-icon" style="background:#dbeafe;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+              </div>
+            </div>
+            <div class="stat-value" id="statUsers">—</div>
+            <div class="stat-sub">Registered learners</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-header">
+              <span class="stat-card-label">Active Students</span>
+              <div class="stat-icon" style="background:#d1fae5;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+              </div>
+            </div>
+            <div class="stat-value" id="statActive">—</div>
+            <div class="stat-sub">Completed at least one quiz</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-header">
+              <span class="stat-card-label">Course Completions</span>
+              <div class="stat-icon" style="background:#ede9fe;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+              </div>
+            </div>
+            <div class="stat-value" id="statCompletions">—</div>
+            <div class="stat-sub">Total across all subjects</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-header">
+              <span class="stat-card-label">Points Awarded</span>
+              <div class="stat-icon" style="background:#fef3c7;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              </div>
+            </div>
+            <div class="stat-value" id="statPoints">—</div>
+            <div class="stat-sub">Total platform points</div>
+          </div>
+        </div>
+
+        <!-- Charts row -->
+        <div class="two-col" style="margin-bottom:20px;">
+
+          <!-- Top learners -->
+          <div class="panel">
+            <div class="panel-header">
+              <div>
+                <div class="panel-title">Top Learners</div>
+                <div class="panel-subtitle">Ranked by total points earned</div>
+              </div>
+            </div>
+            <div class="bar-chart" id="topLearnersChart">
+              <div class="empty-state" style="padding:32px 0;">
+                <div class="empty-icon">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--slate-400)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                </div>
+                <p style="font-size:13px;">No data yet</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Subject breakdown -->
+          <div class="panel">
+            <div class="panel-header">
+              <div>
+                <div class="panel-title">Subject Popularity</div>
+                <div class="panel-subtitle">Completions per subject area</div>
+              </div>
+            </div>
+            <div class="bar-chart" id="subjectChart">
+              <div class="empty-state" style="padding:32px 0;">
+                <div class="empty-icon">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--slate-400)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                </div>
+                <p style="font-size:13px;">No data yet</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Recent registrations -->
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <div class="panel-title">Recent Registrations</div>
+              <div class="panel-subtitle">Last 10 users to join SkillQuest</div>
+            </div>
+          </div>
+          <div id="recentUsersTable">
+            <div class="empty-state">
+              <div class="empty-icon">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--slate-400)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+              </div>
+              <h3>No users yet</h3>
+              <p>Users will appear here once they register on SkillQuest.</p>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /overview -->
+
+
+      <!-- ═══════════════════════════
+           PAGE: USERS
+      ═══════════════════════════ -->
+      <div class="admin-page" id="page-users">
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <div class="panel-title">All Registered Users</div>
+              <div class="panel-subtitle" id="userCountLabel">Loading...</div>
+            </div>
+            <button class="btn btn-success" onclick="exportCSV()" style="padding:8px 16px;font-size:13px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Export CSV
+            </button>
+          </div>
+
+          <div class="table-toolbar">
+            <div class="search-input-wrap">
+              <span class="search-icon-abs">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+              </span>
+              <input type="text" class="search-input" id="userSearch" placeholder="Search by name or email..." oninput="filterUsers()">
+            </div>
+            <select class="sort-select" id="userSort" onchange="filterUsers()">
+              <option value="points">Sort by points</option>
+              <option value="name">Sort by name</option>
+              <option value="courses">Sort by courses completed</option>
+              <option value="date">Sort by join date</option>
+            </select>
+          </div>
+
+          <div style="overflow-x:auto;">
+            <table class="data-table" id="usersTable">
+              <thead>
+                <tr>
+                  <th>User</th>
+                  <th>Points</th>
+                  <th>Courses Done</th>
+                  <th>Last Active</th>
+                  <th>Joined</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="usersTableBody">
+                <tr><td colspan="6" style="text-align:center;padding:40px;color:var(--text-muted);">Loading users...</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="pagination" id="usersPagination">
+            <span id="paginationInfo">—</span>
+            <div class="page-btns" id="pageButtons"></div>
+          </div>
+        </div>
+      </div><!-- /users -->
+
+
+      <!-- ═══════════════════════════
+           PAGE: LEADERBOARD
+      ═══════════════════════════ -->
+      <div class="admin-page" id="page-leaderboard">
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <div class="panel-title">Platform Leaderboard</div>
+              <div class="panel-subtitle">All users ranked by points and course completions</div>
+            </div>
+          </div>
+          <div style="overflow-x:auto;">
+            <table class="data-table" id="lbTable">
+              <thead>
+                <tr>
+                  <th style="width:60px;">Rank</th>
+                  <th>Learner</th>
+                  <th>Points</th>
+                  <th>Courses Completed</th>
+                  <th>Last Active</th>
+                </tr>
+              </thead>
+              <tbody id="lbTableBody">
+                <tr><td colspan="5" style="text-align:center;padding:40px;color:var(--text-muted);">Loading...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div><!-- /leaderboard -->
+
+
+      <!-- ═══════════════════════════
+           PAGE: MESSAGES
+      ═══════════════════════════ -->
+      <div class="admin-page" id="page-messages">
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <div class="panel-title">Contact Messages</div>
+              <div class="panel-subtitle" id="msgCountLabel">Loading...</div>
+            </div>
+          </div>
+          <div id="messagesContainer">
+            <div class="empty-state">
+              <div class="empty-icon">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--slate-400)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              </div>
+              <h3>No messages yet</h3>
+              <p>Contact form submissions will appear here.</p>
+            </div>
+          </div>
+        </div>
+      </div><!-- /messages -->
+
+    </div><!-- /admin-content -->
+  </main>
+</div><!-- /adminShell -->
+
+<div id="toast"></div>
+
+<script>
+/* ════════════════════════════════════
+   CONFIG
+════════════════════════════════════ */
+const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  ? 'http://localhost:3000'
+  : '';   // same-origin on production
+
+let adminToken = sessionStorage.getItem('sq_admin_token') || null;
+
+// ─── cached data ───
+let allUsers     = [];
+let allMessages  = [];
+let adminStats   = null;
+
+// ─── pagination ───
+let currentPage   = 1;
+const PAGE_SIZE   = 20;
+let filteredUsers = [];
+
+/* ════════════════════════════════════
+   BOOT
+════════════════════════════════════ */
+(function boot() {
+  if (adminToken) {
+    showShell();
+    refreshAll();
+  }
+
+  // Allow Enter from either field to submit
+  ['adminEmail','adminPass'].forEach(id => {
+    document.getElementById(id).addEventListener('keydown', e => {
+      if (e.key === 'Enter') doLogin();
+    });
+  });
+})();
+
+/* ════════════════════════════════════
+   AUTH
+════════════════════════════════════ */
+async function doLogin() {
+  const email = document.getElementById('adminEmail').value.trim();
+  const pw    = document.getElementById('adminPass').value.trim();
+  const btn   = document.getElementById('loginBtn');
+  const err   = document.getElementById('loginError');
+
+  if (!email) { showErr('Please enter your admin email.'); return; }
+  if (!pw)    { showErr('Please enter your admin password.'); return; }
+
+  btn.innerHTML = '<span class="spinner"></span> Signing in...';
+  btn.disabled  = true;
+  err.style.display = 'none';
+
+  try {
+    const res  = await fetch(`${API_BASE}/api/admin/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password: pw })
+    });
+    const data = await res.json();
+
+    if (!res.ok) throw new Error(data.error || 'Login failed');
+
+    adminToken = data.token;
+    sessionStorage.setItem('sq_admin_token', adminToken);
+
+    showShell();
+    refreshAll();
+
+  } catch (e) {
+    showErr(e.message);
+    btn.innerHTML = 'Sign in';
+    btn.disabled  = false;
+  }
+}
+
+function showErr(msg) {
+  const el = document.getElementById('loginError');
+  el.textContent  = msg;
+  el.style.display = 'block';
+}
+
+function doLogout() {
+  adminToken = null;
+  sessionStorage.removeItem('sq_admin_token');
+  document.getElementById('adminShell').style.display = 'none';
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('adminEmail').value = '';
+  document.getElementById('adminPass').value  = '';
+}
+
+function showShell() {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('adminShell').style.display = 'block';
+}
+
+/* ════════════════════════════════════
+   API HELPERS
+════════════════════════════════════ */
+async function apiFetch(path) {
+  const res = await fetch(`${API_BASE}${path}`, {
+    headers: { Authorization: `Bearer ${adminToken}` }
+  });
+  if (res.status === 401 || res.status === 403) {
+    doLogout();
+    throw new Error('Session expired. Please log in again.');
+  }
+  if (!res.ok) {
+    const d = await res.json().catch(() => ({}));
+    throw new Error(d.error || `HTTP ${res.status}`);
+  }
+  return res.json();
+}
+
+/* ════════════════════════════════════
+   LOAD ALL DATA
+════════════════════════════════════ */
+async function refreshAll() {
+  updateRefreshTime();
+  try {
+    const [stats, users, messages] = await Promise.all([
+      apiFetch('/api/admin/stats'),
+      apiFetch('/api/admin/users'),
+      apiFetch('/api/admin/messages')
+    ]);
+
+    adminStats  = stats;
+    allUsers    = users;
+    allMessages = messages;
+
+    renderOverview();
+    renderUsersTable();
+    renderLeaderboard();
+    renderMessages();
+  } catch (e) {
+    showToast('Error loading data: ' + e.message);
+  }
+}
+
+function updateRefreshTime() {
+  const now = new Date();
+  document.getElementById('lastRefresh').textContent =
+    'Updated ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}
+
+/* ════════════════════════════════════
+   NAVIGATION
+════════════════════════════════════ */
+const PAGE_TITLES = {
+  overview:    'Overview',
+  users:       'Registered Users',
+  leaderboard: 'Leaderboard',
+  messages:    'Contact Messages'
+};
+
+function showPage(id, btn) {
+  document.querySelectorAll('.admin-page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  if (btn) btn.classList.add('active');
+  document.getElementById('topbarTitle').textContent = PAGE_TITLES[id] || id;
+}
+
+/* ════════════════════════════════════
+   RENDER: OVERVIEW
+════════════════════════════════════ */
+function renderOverview() {
+  if (!adminStats) return;
+
+  document.getElementById('statUsers').textContent       = fmtNum(adminStats.totalUsers       ?? 0);
+  document.getElementById('statActive').textContent      = fmtNum(adminStats.activeStudents   ?? 0);
+  document.getElementById('statCompletions').textContent = fmtNum(adminStats.totalCompletions ?? 0);
+  document.getElementById('statPoints').textContent      = fmtNum(adminStats.totalPoints      ?? 0);
+
+  // Top learners bar chart (top 5)
+  const topUsers = [...allUsers].sort((a,b) => b.points - a.points).slice(0, 5);
+  const maxPts   = topUsers[0]?.points || 1;
+  const colors   = ['#2563eb','#7c3aed','#059669','#d97706','#dc2626'];
+
+  if (topUsers.length) {
+    document.getElementById('topLearnersChart').innerHTML = topUsers.map((u, i) => `
+      <div class="bar-row">
+        <div class="bar-label" title="${esc(u.name)}">${esc(u.name)}</div>
+        <div class="bar-track">
+          <div class="bar-fill" style="width:${Math.max(4, Math.round(u.points/maxPts*100))}%;background:${colors[i]};"></div>
+        </div>
+        <div class="bar-val">${fmtNum(u.points)}</div>
+      </div>
+    `).join('');
+  }
+
+  // Subject breakdown — approximate from completions data
+  if (adminStats.subjectBreakdown && adminStats.subjectBreakdown.length) {
+    const maxSub = Math.max(...adminStats.subjectBreakdown.map(s => s.completions), 1);
+    const subColors = {
+      'ai-tech':'#7c3aed','finance':'#d97706','cybersecurity':'#dc2626',
+      'digital':'#0891b2','career':'#059669','entrepreneurship':'#db2777'
+    };
+    document.getElementById('subjectChart').innerHTML = adminStats.subjectBreakdown.map(s => `
+      <div class="bar-row">
+        <div class="bar-label" title="${esc(s.subject_id)}">${esc(subjectLabel(s.subject_id))}</div>
+        <div class="bar-track">
+          <div class="bar-fill" style="width:${Math.max(4, Math.round(s.completions/maxSub*100))}%;background:${subColors[s.subject_id]||'#2563eb'};"></div>
+        </div>
+        <div class="bar-val">${s.completions}</div>
+      </div>
+    `).join('');
+  }
+
+  // Recent registrations (last 10 by join date)
+  const recent = [...allUsers].sort((a,b) => new Date(b.joined) - new Date(a.joined)).slice(0, 10);
+  if (recent.length) {
+    document.getElementById('recentUsersTable').innerHTML = `
+      <div style="overflow-x:auto;">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>User</th>
+              <th>Points</th>
+              <th>Courses Completed</th>
+              <th>Joined</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${recent.map(u => `
+              <tr>
+                <td>
+                  <div class="user-cell">
+                    <div class="user-avatar-sm" style="background:${avatarColor(u.name)};">${u.name[0].toUpperCase()}</div>
+                    <div>
+                      <div class="user-name">${esc(u.name)}</div>
+                      <div class="user-email">${esc(u.email)}</div>
+                    </div>
+                  </div>
+                </td>
+                <td><strong>${fmtNum(u.points || 0)}</strong></td>
+                <td>${u.coursesCompleted || 0} courses</td>
+                <td>${fmtDate(u.joined)}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    `;
+  } else {
+    document.getElementById('recentUsersTable').innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--slate-400)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+        </div>
+        <h3>No users yet</h3>
+        <p>Users will appear here once they register on SkillQuest.</p>
+      </div>
+    `;
+  }
+}
+
+/* ════════════════════════════════════
+   RENDER: USERS TABLE
+════════════════════════════════════ */
+function filterUsers() {
+  const q    = (document.getElementById('userSearch')?.value || '').toLowerCase();
+  const sort = document.getElementById('userSort')?.value || 'points';
+
+  filteredUsers = allUsers.filter(u =>
+    u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q)
+  );
+
+  filteredUsers.sort((a, b) => {
+    if (sort === 'points')  return (b.points||0) - (a.points||0);
+    if (sort === 'name')    return a.name.localeCompare(b.name);
+    if (sort === 'courses') return (b.coursesCompleted||0) - (a.coursesCompleted||0);
+    if (sort === 'date')    return new Date(b.joined) - new Date(a.joined);
+    return 0;
+  });
+
+  currentPage = 1;
+  renderUsersTable();
+}
+
+function renderUsersTable() {
+  if (!allUsers.length) {
+    document.getElementById('userCountLabel').textContent = 'No users registered yet';
+    document.getElementById('usersTableBody').innerHTML =
+      `<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--text-muted);">No users yet.</td></tr>`;
+    document.getElementById('paginationInfo').textContent = '';
+    document.getElementById('pageButtons').innerHTML = '';
+    return;
+  }
+
+  if (!filteredUsers.length) filteredUsers = [...allUsers];
+  filterUsers();
+
+  const total    = filteredUsers.length;
+  const pages    = Math.ceil(total / PAGE_SIZE);
+  const start    = (currentPage - 1) * PAGE_SIZE;
+  const pageData = filteredUsers.slice(start, start + PAGE_SIZE);
+
+  document.getElementById('userCountLabel').textContent =
+    `${total} user${total !== 1 ? 's' : ''} registered`;
+
+  document.getElementById('usersTableBody').innerHTML = pageData.map(u => {
+    const isActive = u.points > 0 || u.coursesCompleted > 0;
+    const statusBadge = isActive
+      ? '<span class="badge badge-green">Active</span>'
+      : '<span class="badge badge-gray">No activity</span>';
+
+    return `
+      <tr>
+        <td>
+          <div class="user-cell">
+            <div class="user-avatar-sm" style="background:${avatarColor(u.name)};">${u.name[0].toUpperCase()}</div>
+            <div>
+              <div class="user-name">${esc(u.name)}</div>
+              <div class="user-email">${esc(u.email)}</div>
+            </div>
+          </div>
+        </td>
+        <td>
+          <strong style="color:var(--primary);">${fmtNum(u.points || 0)}</strong>
+          <span style="font-size:12px;color:var(--text-muted);"> pts</span>
+        </td>
+        <td>${u.coursesCompleted || 0} courses</td>
+        <td>${u.lastActive ? fmtDate(u.lastActive) : '<span style="color:var(--slate-400);">Never</span>'}</td>
+        <td>${fmtDate(u.joined)}</td>
+        <td>${statusBadge}</td>
+      </tr>
+    `;
+  }).join('');
+
+  // Pagination info
+  const from = start + 1;
+  const to   = Math.min(start + PAGE_SIZE, total);
+  document.getElementById('paginationInfo').textContent = `Showing ${from}–${to} of ${total}`;
+
+  // Page buttons
+  const btns = [];
+  btns.push(`<button class="page-btn" onclick="goPage(${currentPage-1})" ${currentPage===1?'disabled':''}>&#8592;</button>`);
+  for (let p = 1; p <= pages; p++) {
+    if (pages <= 7 || Math.abs(p - currentPage) <= 2 || p === 1 || p === pages) {
+      btns.push(`<button class="page-btn ${p===currentPage?'active':''}" onclick="goPage(${p})">${p}</button>`);
+    } else if (btns[btns.length-1] !== '…') {
+      btns.push('…');
+    }
+  }
+  btns.push(`<button class="page-btn" onclick="goPage(${currentPage+1})" ${currentPage===pages?'disabled':''}>&#8594;</button>`);
+  document.getElementById('pageButtons').innerHTML = btns.join('');
+}
+
+function goPage(p) {
+  const pages = Math.ceil(filteredUsers.length / PAGE_SIZE);
+  if (p < 1 || p > pages) return;
+  currentPage = p;
+  renderUsersTable();
+  document.getElementById('page-users').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+/* ════════════════════════════════════
+   RENDER: LEADERBOARD
+════════════════════════════════════ */
+function renderLeaderboard() {
+  const sorted = [...allUsers]
+    .sort((a,b) => (b.points||0) - (a.points||0) || (b.coursesCompleted||0) - (a.coursesCompleted||0))
+    .filter(u => u.points > 0 || u.coursesCompleted > 0);
+
+  if (!sorted.length) {
+    document.getElementById('lbTableBody').innerHTML =
+      `<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--text-muted);">No activity recorded yet. Scores appear once a quiz is completed.</td></tr>`;
+    return;
+  }
+
+  const medalStyle = [
+    'background:#FFD700;color:#7a5c00;border:1.5px solid #e6b800;',
+    'background:#C0C8D0;color:#4a5568;border:1.5px solid #a0aab4;',
+    'background:#CD8B5A;color:#6b3a1f;border:1.5px solid #b47040;'
+  ];
+
+  document.getElementById('lbTableBody').innerHTML = sorted.map((u, i) => {
+    const rank = i + 1;
+    const rankDisplay = rank <= 3
+      ? `<span class="rank-medal" style="${medalStyle[rank-1]}">${rank}</span>`
+      : `<span style="font-weight:700;color:var(--text-muted);font-size:14px;">${rank}</span>`;
+
+    return `
+      <tr>
+        <td style="text-align:center;">${rankDisplay}</td>
+        <td>
+          <div class="user-cell">
+            <div class="user-avatar-sm" style="background:${avatarColor(u.name)};">${u.name[0].toUpperCase()}</div>
+            <div>
+              <div class="user-name">${esc(u.name)}</div>
+              <div class="user-email">${esc(u.email)}</div>
+            </div>
+          </div>
+        </td>
+        <td><strong style="color:var(--primary);">${fmtNum(u.points||0)}</strong></td>
+        <td>${u.coursesCompleted||0} courses</td>
+        <td>${u.lastActive ? fmtDate(u.lastActive) : '<span style="color:var(--slate-400);">—</span>'}</td>
+      </tr>
+    `;
+  }).join('');
+}
+
+/* ════════════════════════════════════
+   RENDER: MESSAGES
+════════════════════════════════════ */
+function renderMessages() {
+  const count = allMessages.length;
+  document.getElementById('msgCountLabel').textContent =
+    `${count} message${count !== 1 ? 's' : ''} received`;
+
+  if (!count) {
+    document.getElementById('messagesContainer').innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--slate-400)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </div>
+        <h3>No messages yet</h3>
+        <p>Contact form submissions will appear here.</p>
+      </div>
+    `;
+    return;
+  }
+
+  const typeLabels = {
+    'general':        'General',
+    'bug':            'Bug Report',
+    'feature-request':'Feature Request',
+    'course-feedback':'Course Feedback',
+    'other':          'Other'
+  };
+  const typeBadge = {
+    'general':         'badge-blue',
+    'bug':             'badge-red',
+    'feature-request': 'badge-amber',
+    'course-feedback': 'badge-green',
+    'other':           'badge-gray'
+  };
+
+  document.getElementById('messagesContainer').innerHTML = allMessages
+    .sort((a,b) => new Date(b.created_at) - new Date(a.created_at))
+    .map(m => `
+      <div class="message-card">
+        <div class="message-meta">
+          <span class="message-from">${esc(m.name)}</span>
+          <span class="message-email">${esc(m.email)}</span>
+          ${m.type ? `<span class="badge ${typeBadge[m.type]||'badge-gray'}">${typeLabels[m.type]||m.type}</span>` : ''}
+          <span class="message-date">${fmtDateTime(m.created_at)}</span>
+        </div>
+        ${m.subject ? `<div class="message-subject">${esc(m.subject)}</div>` : ''}
+        <div class="message-body">${esc(m.message)}</div>
+      </div>
+    `).join('');
+}
+
+/* ════════════════════════════════════
+   EXPORT CSV
+════════════════════════════════════ */
+async function exportCSV() {
+  showToast('Preparing CSV export...');
+  try {
+    const res = await fetch(`${API_BASE}/api/admin/export-csv`, {
+      headers: { Authorization: `Bearer ${adminToken}` }
+    });
+    if (!res.ok) throw new Error('Export failed');
+
+    const blob = await res.blob();
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href     = url;
+    a.download = `skillquest-users-${new Date().toISOString().slice(0,10)}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    showToast('CSV downloaded successfully.');
+  } catch (e) {
+    showToast('Export error: ' + e.message);
+  }
+}
+
+/* ════════════════════════════════════
+   UTILITIES
+════════════════════════════════════ */
+function fmtNum(n) {
+  return Number(n).toLocaleString();
+}
+
+function fmtDate(iso) {
+  if (!iso) return '—';
+  return new Date(iso).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
+}
+
+function fmtDateTime(iso) {
+  if (!iso) return '—';
+  return new Date(iso).toLocaleString('en-GB', {
+    day:'numeric', month:'short', year:'numeric',
+    hour:'2-digit', minute:'2-digit'
+  });
+}
+
+function esc(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;');
+}
+
+function avatarColor(name) {
+  const colors = ['#2563eb','#7c3aed','#059669','#d97706','#dc2626','#0891b2','#db2777'];
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  return colors[Math.abs(hash) % colors.length];
+}
+
+function subjectLabel(id) {
+  const map = {
+    'ai-tech':          'AI & Technology',
+    'finance':          'Personal Finance',
+    'cybersecurity':    'Cybersecurity',
+    'digital':          'Digital Skills',
+    'career':           'Career & Work',
+    'entrepreneurship': 'Entrepreneurship'
+  };
+  return map[id] || id;
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), 3500);
+}
+</script>
+</body>
+</html>
