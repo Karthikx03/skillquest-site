@@ -373,7 +373,7 @@ app.get('/api/admin/stats', adminMiddleware, async (_req, res) => {
     const [completions] = await q(`SELECT COUNT(*) AS total FROM progress WHERE (data->>'completed')::boolean = true`);
     const [points]      = await q('SELECT COALESCE(SUM(total), 0) AS total FROM user_points');
     const [messages]    = await q('SELECT COUNT(*) AS total FROM contacts');
-    const [avgScore]    = await q('SELECT ROUND(AVG(score::FLOAT / NULLIF(total_q, 0) * 100), 1) AS avg FROM activity');
+    const [avgScore]    = await q(`SELECT ROUND(AVG(score * 100.0 / NULLIF(total_q, 0))::NUMERIC, 1) AS avg FROM activity`);
     const [active]      = await q('SELECT COUNT(DISTINCT user_id) AS total FROM activity');
     const breakdown     = await q(`SELECT subject_id, COUNT(*) AS completions FROM progress WHERE (data->>'completed')::boolean = true GROUP BY subject_id ORDER BY completions DESC`);
 
@@ -386,7 +386,10 @@ app.get('/api/admin/stats', adminMiddleware, async (_req, res) => {
       activeStudents:    Number(active.total),
       subjectBreakdown:  breakdown.map(r => ({ subject_id: r.subject_id, completions: Number(r.completions) }))
     });
-  } catch (err) { res.status(500).json({ error: 'Server error.' }); }
+  } catch (err) {
+    console.error('Stats error:', err.message);
+    res.status(500).json({ error: 'Server error.' });
+  }
 });
 
 // GET /api/admin/users

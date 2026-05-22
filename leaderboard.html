@@ -169,20 +169,19 @@
     document.getElementById('lbTable').style.display = 'none';
     document.getElementById('emptyLeaderboard').style.display = 'none';
 
-    // Try backend first — it has accurate cross-device data
-    const token = typeof getToken === 'function' ? getToken() : null;
-    if (token) {
-      try {
-        const url = API_BASE + '/api/leaderboard';
-        const res = await fetch(url, { headers: { Authorization: 'Bearer ' + token } });
-        if (res.ok) {
-          const data = await res.json();
-          // data is an array: [{id, name, points, coursesCompleted}]
-          renderRows(data);
-          return;
-        }
-      } catch (_) { /* fall through to localStorage */ }
-    }
+    // Always try backend first — public endpoint, no auth required
+    try {
+      const url = API_BASE + '/api/leaderboard';
+      const headers = {};
+      const token = typeof getToken === 'function' ? getToken() : null;
+      if (token) headers['Authorization'] = 'Bearer ' + token;
+      const res = await fetch(url, { headers });
+      if (res.ok) {
+        const data = await res.json();
+        renderRows(data);
+        return;
+      }
+    } catch (_) { /* fall through to localStorage */ }
 
     // Fallback: use local storage data (works offline / before backend is deployed)
     const localUsers = (typeof getUsers === 'function' ? getUsers() : []).map(u => ({

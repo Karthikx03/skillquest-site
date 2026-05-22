@@ -1249,24 +1249,23 @@ async function apiFetch(path) {
 ════════════════════════════════════ */
 async function refreshAll() {
   updateRefreshTime();
-  try {
-    const [stats, users, messages] = await Promise.all([
-      apiFetch('/api/admin/stats'),
-      apiFetch('/api/admin/users'),
-      apiFetch('/api/admin/messages')
-    ]);
+  const [statsRes, usersRes, messagesRes] = await Promise.allSettled([
+    apiFetch('/api/admin/stats'),
+    apiFetch('/api/admin/users'),
+    apiFetch('/api/admin/messages')
+  ]);
 
-    adminStats  = stats;
-    allUsers    = users;
-    allMessages = messages;
+  if (statsRes.status    === 'fulfilled') adminStats  = statsRes.value;
+  if (usersRes.status    === 'fulfilled') allUsers    = usersRes.value;
+  if (messagesRes.status === 'fulfilled') allMessages = messagesRes.value;
 
-    renderOverview();
-    renderUsersTable();
-    renderLeaderboard();
-    renderMessages();
-  } catch (e) {
-    showToast('Error loading data: ' + e.message);
-  }
+  if (statsRes.status    === 'rejected') showToast('Stats error: ' + statsRes.reason?.message);
+  if (usersRes.status    === 'rejected') showToast('Users error: ' + usersRes.reason?.message);
+
+  renderOverview();
+  renderUsersTable();
+  renderLeaderboard();
+  renderMessages();
 }
 
 function updateRefreshTime() {
