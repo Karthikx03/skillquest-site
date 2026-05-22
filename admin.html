@@ -1420,7 +1420,6 @@ function renderUsersTable() {
   }
 
   if (!filteredUsers.length) filteredUsers = [...allUsers];
-  filterUsers();
 
   const total    = filteredUsers.length;
   const pages    = Math.ceil(total / PAGE_SIZE);
