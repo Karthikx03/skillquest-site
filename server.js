@@ -34,7 +34,9 @@ const pool = new Pool({
   connectionString: DATABASE_URL || 'postgresql://localhost:5432/skillquest',
   ssl: DATABASE_URL ? { rejectUnauthorized: false } : false,
   max: 10,
-  idleTimeoutMillis: 30000
+  idleTimeoutMillis: 30000,
+  // Force IPv4 — Render free tier does not support IPv6 (ENETUNREACH)
+  family: 4
 });
 
 /* ── DB helpers ──────────────────────────────────────────── */
