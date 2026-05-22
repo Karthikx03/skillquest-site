@@ -358,9 +358,9 @@ app.post('/api/admin/login', (req, res) => {
   const { email, password } = req.body || {};
   if (!email || !password)
     return res.status(400).json({ error: 'Email and password are required.' });
-  if (email.toLowerCase().trim() !== ADMIN_EMAIL.toLowerCase().trim())
-    return res.status(401).json({ error: 'Incorrect admin credentials.' });
-  if (password !== ADMIN_PASSWORD)
+  const emailOk = email.toLowerCase().trim() === ADMIN_EMAIL.toLowerCase().trim();
+  const passOk  = password.trim() === ADMIN_PASSWORD.trim();
+  if (!emailOk || !passOk)
     return res.status(401).json({ error: 'Incorrect admin credentials.' });
   const token = jwt.sign({ admin: true, email }, JWT_SECRET, { expiresIn: '8h' });
   res.json({ token });
