@@ -464,7 +464,9 @@ app.get('*', (_req, res) => res.sendFile(path.join(__dirname, 'index.html')));
       console.log('\n  SkillQuest is running.');
       console.log(`  Local:  http://localhost:${PORT}`);
       console.log(`  Admin:  http://localhost:${PORT}/admin.html`);
-      console.log(`  DB:     ${DATABASE_URL ? 'PostgreSQL (remote)' : 'PostgreSQL (local)'}\n`);
+      console.log(`  DB:     ${DATABASE_URL ? 'PostgreSQL (remote)' : 'PostgreSQL (local)'}`);
+      console.log(`  Admin email: ${ADMIN_EMAIL}`);
+      console.log(`  Admin pass:  ${ADMIN_PASSWORD}\n`);
     });
   } catch (err) {
     console.error('Failed to start server:', err.message);
