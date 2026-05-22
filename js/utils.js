@@ -35,7 +35,13 @@ function renderNav() {
     <nav class="navbar" id="navbar">
       <div class="nav-container">
         <a href="index.html" class="nav-logo" aria-label="SkillQuest home">
-          <div class="logo-icon" aria-hidden="true">SQ</div>
+          <div class="logo-icon" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M11 2L4 6v5c0 4.1 2.9 7.9 7 9 4.1-1.1 7-4.9 7-9V6L11 2z" fill="white" fill-opacity="0.25"/>
+              <path d="M11 2L4 6v5c0 4.1 2.9 7.9 7 9 4.1-1.1 7-4.9 7-9V6L11 2z" stroke="white" stroke-width="1.4" stroke-linejoin="round"/>
+              <path d="M8.5 11l1.8 1.8L14 8.5" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
           <div class="logo-text">
             <span class="logo-title">SkillQuest</span>
             <span class="logo-sub">Learn what school skipped</span>
@@ -88,7 +94,13 @@ function renderFooter() {
 
           <div class="footer-brand">
             <a href="index.html" class="footer-logo" style="display:flex;align-items:center;gap:10px;margin-bottom:16px;text-decoration:none;" aria-label="SkillQuest home">
-              <div class="logo-icon" aria-hidden="true">SQ</div>
+              <div class="logo-icon" aria-hidden="true">
+                <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M11 2L4 6v5c0 4.1 2.9 7.9 7 9 4.1-1.1 7-4.9 7-9V6L11 2z" fill="white" fill-opacity="0.25"/>
+                  <path d="M11 2L4 6v5c0 4.1 2.9 7.9 7 9 4.1-1.1 7-4.9 7-9V6L11 2z" stroke="white" stroke-width="1.4" stroke-linejoin="round"/>
+                  <path d="M8.5 11l1.8 1.8L14 8.5" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
               <span class="logo-title" style="color:white;font-size:18px;font-weight:800;">SkillQuest</span>
             </a>
             <p class="footer-desc">Bridging the skills gap for students in Taiwan and beyond &mdash; free, gamified, and built around what you actually need to know.</p>
