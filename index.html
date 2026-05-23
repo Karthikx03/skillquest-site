@@ -321,66 +321,70 @@
 </section>
 
 <!-- ═══════════════════════════════════════════
-     MONTHLY LOTTERY — USP SECTION
+     MONTHLY PRIZE DRAW — USP SECTION
 ════════════════════════════════════════════ -->
-<section class="section" style="background:linear-gradient(135deg,#1e0a3c 0%,#3b0764 50%,#1d1160 100%);padding:80px 0;overflow:hidden;position:relative;">
-  <div style="position:absolute;inset:0;background:radial-gradient(circle at 25% 60%,rgba(139,92,246,0.2) 0%,transparent 55%),radial-gradient(circle at 75% 30%,rgba(59,130,246,0.15) 0%,transparent 50%);pointer-events:none;"></div>
-  <div class="container" style="position:relative;z-index:1;">
+<section class="section" style="background:linear-gradient(160deg,#0f172a 0%,#1e293b 100%);padding:80px 0;border-top:4px solid #d97706;">
+  <div class="container">
     <div class="section-header">
-      <div class="section-tag" style="background:rgba(139,92,246,0.25);border:1px solid rgba(139,92,246,0.4);color:#c4b5fd;">🎰 Monthly Lottery</div>
-      <h2 style="color:white;">Top learners win real cash prizes</h2>
-      <p style="color:rgba(255,255,255,0.65);">Every month, the top 100 learners on the leaderboard are automatically entered to win Shopee or Amazon gift cards — no tickets, no sign-up, no catch.</p>
+      <div class="section-tag" style="background:rgba(217,119,6,0.15);border:1px solid rgba(217,119,6,0.3);color:#fbbf24;font-size:10px;letter-spacing:0.2em;">Monthly Prize Draw</div>
+      <h2 style="color:white;">Top learners win real prizes every month</h2>
+      <p style="color:rgba(255,255,255,0.55);">The top 100 learners on the leaderboard are automatically entered in a prize draw at the end of each month. No tickets, no cost, no manual sign-up.</p>
     </div>
 
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-bottom:48px;" class="lottery-tiers-preview">
-      <div style="background:linear-gradient(135deg,rgba(88,28,135,0.6),rgba(109,40,217,0.4));border:1px solid rgba(167,139,250,0.35);border-radius:20px;padding:28px 24px;text-align:center;backdrop-filter:blur(8px);">
-        <div style="font-size:40px;margin-bottom:10px;">🏆</div>
-        <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:0.15em;color:#c4b5fd;margin-bottom:6px;">Platinum</div>
-        <div style="font-size:12px;color:rgba(255,255,255,0.5);margin-bottom:14px;">Rank #1 – #10</div>
-        <div style="font-size:32px;font-weight:900;color:white;line-height:1;">NT$2,000</div>
-        <div style="font-size:12px;color:rgba(255,255,255,0.45);margin-top:6px;">Gift card</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-bottom:48px;" class="draw-tiers-grid">
+      <!-- Platinum -->
+      <div style="background:white;border-radius:18px;padding:28px 24px;border-top:4px solid #7c3aed;box-shadow:0 4px 24px rgba(0,0,0,0.15);">
+        <div style="display:inline-flex;align-items:center;gap:6px;background:#ede9fe;border-radius:999px;padding:3px 12px;margin-bottom:12px;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#6d28d9" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L4 6v5c0 4.8 3.4 9.3 8 10.7 4.6-1.4 8-5.9 8-10.7V6L12 2z"/><polyline points="9 12 11 14 15 10"/></svg>
+          <span style="font-size:10px;font-weight:800;letter-spacing:0.15em;text-transform:uppercase;color:#6d28d9;">Platinum</span>
+        </div>
+        <div style="font-size:12px;color:#94a3b8;font-weight:600;margin-bottom:10px;">Rank 1 — 10</div>
+        <div style="font-size:36px;font-weight:900;color:#6d28d9;line-height:1;letter-spacing:-1px;">NT$2,000</div>
+        <div style="font-size:12px;color:#94a3b8;margin-top:5px;">Shopee or Amazon gift card</div>
       </div>
-      <div style="background:linear-gradient(135deg,rgba(120,53,15,0.6),rgba(146,64,14,0.4));border:1px solid rgba(251,191,36,0.35);border-radius:20px;padding:28px 24px;text-align:center;backdrop-filter:blur(8px);">
-        <div style="font-size:40px;margin-bottom:10px;">🥇</div>
-        <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:0.15em;color:#fcd34d;margin-bottom:6px;">Gold</div>
-        <div style="font-size:12px;color:rgba(255,255,255,0.5);margin-bottom:14px;">Rank #11 – #50</div>
-        <div style="font-size:32px;font-weight:900;color:white;line-height:1;">NT$500</div>
-        <div style="font-size:12px;color:rgba(255,255,255,0.45);margin-top:6px;">Gift card</div>
+      <!-- Gold -->
+      <div style="background:white;border-radius:18px;padding:28px 24px;border-top:4px solid #d97706;box-shadow:0 4px 24px rgba(0,0,0,0.15);">
+        <div style="display:inline-flex;align-items:center;gap:6px;background:#fef3c7;border-radius:999px;padding:3px 12px;margin-bottom:12px;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#b45309" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="14" r="7"/><path d="M8.21 6.93 7 5l3 1 2-3 2 3 3-1-1.21 1.93"/></svg>
+          <span style="font-size:10px;font-weight:800;letter-spacing:0.15em;text-transform:uppercase;color:#b45309;">Gold</span>
+        </div>
+        <div style="font-size:12px;color:#94a3b8;font-weight:600;margin-bottom:10px;">Rank 11 — 50</div>
+        <div style="font-size:36px;font-weight:900;color:#b45309;line-height:1;letter-spacing:-1px;">NT$500</div>
+        <div style="font-size:12px;color:#94a3b8;margin-top:5px;">Shopee or Amazon gift card</div>
       </div>
-      <div style="background:linear-gradient(135deg,rgba(15,23,42,0.7),rgba(30,58,95,0.5));border:1px solid rgba(148,163,184,0.3);border-radius:20px;padding:28px 24px;text-align:center;backdrop-filter:blur(8px);">
-        <div style="font-size:40px;margin-bottom:10px;">🥈</div>
-        <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:0.15em;color:#cbd5e1;margin-bottom:6px;">Silver</div>
-        <div style="font-size:12px;color:rgba(255,255,255,0.5);margin-bottom:14px;">Rank #51 – #100</div>
-        <div style="font-size:32px;font-weight:900;color:white;line-height:1;">NT$200</div>
-        <div style="font-size:12px;color:rgba(255,255,255,0.45);margin-top:6px;">Gift card</div>
-      </div>
-    </div>
-
-    <div style="display:flex;align-items:center;gap:32px;flex-wrap:wrap;justify-content:center;">
-      <div style="display:flex;align-items:center;gap:8px;">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="#4ade80" stroke="none"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-        <span style="color:rgba(255,255,255,0.7);font-size:14px;font-weight:600;">Automatic entry — no sign-up needed</span>
-      </div>
-      <div style="display:flex;align-items:center;gap:8px;">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="#4ade80" stroke="none"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-        <span style="color:rgba(255,255,255,0.7);font-size:14px;font-weight:600;">Draw happens on the last day of every month</span>
-      </div>
-      <div style="display:flex;align-items:center;gap:8px;">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="#4ade80" stroke="none"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-        <span style="color:rgba(255,255,255,0.7);font-size:14px;font-weight:600;">Winners notified by email within 24 hours</span>
+      <!-- Silver -->
+      <div style="background:white;border-radius:18px;padding:28px 24px;border-top:4px solid #64748b;box-shadow:0 4px 24px rgba(0,0,0,0.15);">
+        <div style="display:inline-flex;align-items:center;gap:6px;background:#f1f5f9;border-radius:999px;padding:3px 12px;margin-bottom:12px;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="14" r="7"/><path d="M8.21 6.93 7 5l3 1 2-3 2 3 3-1-1.21 1.93"/></svg>
+          <span style="font-size:10px;font-weight:800;letter-spacing:0.15em;text-transform:uppercase;color:#475569;">Silver</span>
+        </div>
+        <div style="font-size:12px;color:#94a3b8;font-weight:600;margin-bottom:10px;">Rank 51 — 100</div>
+        <div style="font-size:36px;font-weight:900;color:#475569;line-height:1;letter-spacing:-1px;">NT$200</div>
+        <div style="font-size:12px;color:#94a3b8;margin-top:5px;">Shopee or Amazon gift card</div>
       </div>
     </div>
 
-    <div style="text-align:center;margin-top:36px;">
-      <a href="rewards.html" class="btn btn-xl" style="background:rgba(139,92,246,0.3);border:1px solid rgba(167,139,250,0.5);color:white;backdrop-filter:blur(8px);">See how the lottery works →</a>
-      <a href="leaderboard.html" class="btn btn-xl" style="background:transparent;border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.7);margin-left:12px;">View leaderboard →</a>
+    <div style="display:flex;align-items:center;gap:28px;flex-wrap:wrap;justify-content:center;margin-bottom:36px;">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="#4ade80" stroke="none"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <span style="color:rgba(255,255,255,0.6);font-size:13px;font-weight:600;">Automatic entry — no sign-up required</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="#4ade80" stroke="none"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <span style="color:rgba(255,255,255,0.6);font-size:13px;font-weight:600;">Draw on the last day of each month</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="#4ade80" stroke="none"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <span style="color:rgba(255,255,255,0.6);font-size:13px;font-weight:600;">Winners notified by email within 24 hours</span>
+      </div>
+    </div>
+
+    <div style="text-align:center;">
+      <a href="rewards.html" class="btn btn-xl" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.18);color:white;">View draw details and eligibility</a>
+      <a href="leaderboard.html" class="btn btn-xl" style="background:transparent;border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.5);margin-left:12px;">View leaderboard</a>
     </div>
   </div>
-  <style>
-    @media (max-width: 640px) {
-      .lottery-tiers-preview { grid-template-columns: 1fr !important; }
-    }
-  </style>
+  <style>@media(max-width:640px){.draw-tiers-grid{grid-template-columns:1fr !important;}}</style>
 </section>
 
 <!-- ═══════════════════════════════════════════

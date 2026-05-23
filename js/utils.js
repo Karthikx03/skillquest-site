@@ -173,7 +173,7 @@ function showToast(message, type = 'success') {
   toast.className = 'toast toast-' + type;
   toast.setAttribute('role', 'alert');
   toast.innerHTML = `<span class="toast-icon">${icons[type] || icons.info}</span><span class="toast-msg">${message}</span><button class="toast-close" onclick="this.parentElement.remove()" aria-label="Dismiss">&times;</button>`;
-  toast.style.cssText = `position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;align-items:center;gap:10px;background:${colors[type]||colors.info};color:#fff;padding:14px 18px;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.2);font-size:14px;font-weight:500;max-width:380px;animation:slideInRight 0.3s ease;`;
+  toast.style.cssText = `position:fixed;bottom:24px;left:24px;z-index:9999;display:flex;align-items:center;gap:10px;background:${colors[type]||colors.info};color:#fff;padding:14px 18px;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.2);font-size:14px;font-weight:500;max-width:380px;animation:slideInLeft 0.3s ease;`;
   document.body.appendChild(toast);
   setTimeout(() => { if (toast.parentElement) toast.style.animation = 'fadeOut 0.3s ease forwards'; }, 3500);
   setTimeout(() => { if (toast.parentElement) toast.remove(); }, 3900);
@@ -212,6 +212,14 @@ function getDifficultyColor(d) {
 function initPage() {
   renderNav();
   renderFooter();
+
+  /* Inject AI assistant script once (on all pages) */
+  if (!document.getElementById('sq-ai-script')) {
+    const s = document.createElement('script');
+    s.id  = 'sq-ai-script';
+    s.src = 'js/ai-assistant.js';
+    document.body.appendChild(s);
+  }
 
   /* Close mobile menu on outside click */
   document.addEventListener('click', e => {
@@ -262,7 +270,7 @@ function initPage() {
 (function () {
   const s = document.createElement('style');
   s.textContent = `
-    @keyframes slideInRight { from { transform:translateX(110%);opacity:0; } to { transform:translateX(0);opacity:1; } }
+    @keyframes slideInLeft  { from { transform:translateX(-110%);opacity:0; } to { transform:translateX(0);opacity:1; } }
     @keyframes fadeOut      { from { opacity:1; } to { opacity:0;transform:translateY(8px); } }
     .toast-close { background:none;border:none;color:#fff;cursor:pointer;font-size:18px;padding:0;margin-left:4px;opacity:0.8;line-height:1; }
     .toast-close:hover { opacity:1; }
