@@ -4,98 +4,492 @@
   <meta charset="UTF-8">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Rewards - SkillQuest</title>
+  <title>Monthly Lottery – SkillQuest</title>
   <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* ── Lottery hero ── */
+    .lottery-hero {
+      background: linear-gradient(135deg, #1e0a3c 0%, #3b0764 45%, #1d1160 100%);
+      padding: 72px 24px 80px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .lottery-hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 20% 50%, rgba(139,92,246,0.25) 0%, transparent 55%),
+        radial-gradient(circle at 80% 30%, rgba(59,130,246,0.2) 0%, transparent 50%);
+      pointer-events: none;
+    }
+    .lottery-hero .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(139,92,246,0.3);
+      border: 1px solid rgba(139,92,246,0.5);
+      color: #c4b5fd;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      padding: 6px 16px;
+      border-radius: 999px;
+      margin-bottom: 20px;
+    }
+    .lottery-hero h1 {
+      font-size: clamp(32px, 6vw, 58px);
+      font-weight: 900;
+      color: white;
+      line-height: 1.1;
+      margin-bottom: 16px;
+    }
+    .lottery-hero h1 span { color: #a78bfa; }
+    .lottery-hero p {
+      font-size: 18px;
+      color: rgba(255,255,255,0.7);
+      max-width: 560px;
+      margin: 0 auto 40px;
+      line-height: 1.65;
+    }
+
+    /* Countdown */
+    .countdown-wrap {
+      display: inline-flex;
+      gap: 0;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 20px;
+      padding: 24px 36px;
+      gap: 8px;
+    }
+    .cd-unit {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 64px;
+    }
+    .cd-num {
+      font-size: 42px;
+      font-weight: 900;
+      color: white;
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+    }
+    .cd-label {
+      font-size: 11px;
+      color: rgba(255,255,255,0.5);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-top: 6px;
+    }
+    .cd-sep {
+      font-size: 36px;
+      color: rgba(255,255,255,0.3);
+      font-weight: 900;
+      align-self: flex-start;
+      padding-top: 4px;
+    }
+    .countdown-label {
+      margin-top: 14px;
+      font-size: 13px;
+      color: rgba(255,255,255,0.45);
+      font-weight: 600;
+    }
+
+    /* ── Tier cards ── */
+    .tier-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 24px;
+      margin-bottom: 64px;
+    }
+    .tier-card {
+      border-radius: 24px;
+      padding: 36px 28px;
+      position: relative;
+      overflow: hidden;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+    }
+    .tier-card.platinum {
+      background: linear-gradient(135deg, #1e0a3c, #4c1d95);
+      border: 1px solid rgba(167,139,250,0.4);
+    }
+    .tier-card.gold {
+      background: linear-gradient(135deg, #451a03, #92400e);
+      border: 1px solid rgba(251,191,36,0.4);
+    }
+    .tier-card.silver {
+      background: linear-gradient(135deg, #0f172a, #1e3a5f);
+      border: 1px solid rgba(148,163,184,0.4);
+    }
+    .tier-crown {
+      font-size: 44px;
+      margin-bottom: 12px;
+      display: block;
+      filter: drop-shadow(0 4px 12px rgba(0,0,0,0.4));
+    }
+    .tier-badge {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      padding: 4px 14px;
+      border-radius: 999px;
+      margin-bottom: 14px;
+    }
+    .platinum .tier-badge { background: rgba(167,139,250,0.25); color: #c4b5fd; border: 1px solid rgba(167,139,250,0.4); }
+    .gold     .tier-badge { background: rgba(251,191,36,0.2);  color: #fcd34d; border: 1px solid rgba(251,191,36,0.4); }
+    .silver   .tier-badge { background: rgba(148,163,184,0.2); color: #cbd5e1; border: 1px solid rgba(148,163,184,0.4); }
+    .tier-rank {
+      font-size: 15px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.65);
+      margin-bottom: 18px;
+    }
+    .tier-prize {
+      font-size: 38px;
+      font-weight: 900;
+      color: white;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+    .tier-prize-sub {
+      font-size: 14px;
+      color: rgba(255,255,255,0.55);
+      margin-bottom: 24px;
+    }
+    .tier-detail {
+      font-size: 13px;
+      color: rgba(255,255,255,0.45);
+      line-height: 1.7;
+    }
+    .tier-card .auto-badge {
+      margin-top: 20px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #4ade80;
+      background: rgba(74,222,128,0.1);
+      border: 1px solid rgba(74,222,128,0.25);
+      padding: 5px 14px;
+      border-radius: 999px;
+    }
+
+    /* ── User status banner ── */
+    .user-status-card {
+      border-radius: 20px;
+      padding: 28px 32px;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      flex-wrap: wrap;
+      margin-bottom: 64px;
+    }
+    .user-status-card.eligible {
+      background: linear-gradient(135deg, #064e3b, #065f46);
+      border: 1px solid rgba(52,211,153,0.3);
+    }
+    .user-status-card.not-eligible {
+      background: var(--slate-100);
+      border: 1px solid var(--slate-200);
+    }
+    .status-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 26px;
+    }
+    .status-text { flex: 1; }
+    .status-title { font-size: 18px; font-weight: 800; margin-bottom: 4px; }
+    .status-desc { font-size: 14px; opacity: 0.75; }
+    .status-cta .btn { white-space: nowrap; }
+
+    /* ── How to qualify ── */
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 24px;
+      margin-bottom: 64px;
+    }
+    .step-card {
+      background: white;
+      border: 1px solid var(--slate-200);
+      border-radius: 20px;
+      padding: 28px 24px;
+      text-align: center;
+      box-shadow: var(--shadow-sm);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .step-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+    .step-num {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #2563eb, #7c3aed);
+      color: white;
+      font-size: 16px;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+    }
+    .step-icon { font-size: 32px; margin-bottom: 12px; }
+    .step-title { font-weight: 800; font-size: 15px; margin-bottom: 6px; color: var(--text-primary); }
+    .step-desc { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+
+    /* ── Points history ── */
+    .history-row {
+      padding: 14px 24px;
+      border-bottom: 1px solid var(--slate-200);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 14px;
+    }
+    .history-row:last-child { border-bottom: none; }
+    .history-row .activity-name { font-weight: 600; flex: 1; }
+    .history-row .activity-pts { font-weight: 800; color: #059669; }
+    .history-row .activity-date { color: var(--text-muted); font-size: 12px; min-width: 80px; text-align: right; }
+
+    /* ── FAQ ── */
+    .faq-item {
+      background: white;
+      border: 1px solid var(--slate-200);
+      border-radius: 16px;
+      margin-bottom: 12px;
+      overflow: hidden;
+    }
+    .faq-q {
+      padding: 20px 24px;
+      font-weight: 700;
+      font-size: 15px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      user-select: none;
+    }
+    .faq-q:hover { background: var(--slate-50); }
+    .faq-arrow { transition: transform 0.25s; flex-shrink: 0; }
+    .faq-item.open .faq-arrow { transform: rotate(180deg); }
+    .faq-a {
+      display: none;
+      padding: 0 24px 20px;
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.75;
+    }
+    .faq-item.open .faq-a { display: block; }
+
+    @media (max-width: 600px) {
+      .countdown-wrap { gap: 4px; padding: 18px 20px; }
+      .cd-num { font-size: 30px; }
+      .cd-unit { min-width: 50px; }
+      .tier-prize { font-size: 30px; }
+      .user-status-card { flex-direction: column; text-align: center; }
+    }
+  </style>
 </head>
 <body>
 <div id="navbar"></div>
-<div class="nav-spacer"></div>
 
-<div class="page-header">
-  <div class="container">
-    <div class="section-tag" style="color:rgba(255,255,255,0.7);background:rgba(255,255,255,0.1);">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>Rewards
+<!-- ── HERO ── -->
+<section class="lottery-hero">
+  <div style="position:relative;z-index:1;">
+    <div class="tag">
+      🎰 Monthly Lottery
     </div>
-    <h1>Rewards &amp; Lottery</h1>
-    <p>Earn points by completing courses, then redeem them for prizes.</p>
+    <h1>Learn More.<br>Rank Higher.<br><span>Win Real Prizes.</span></h1>
+    <p>Every month, the top learners on SkillQuest automatically enter a lottery for cash gift cards — no sign-up, no tickets needed.</p>
+
+    <div class="countdown-wrap" id="countdownWrap">
+      <div class="cd-unit"><div class="cd-num" id="cdDays">--</div><div class="cd-label">Days</div></div>
+      <div class="cd-sep">:</div>
+      <div class="cd-unit"><div class="cd-num" id="cdHrs">--</div><div class="cd-label">Hours</div></div>
+      <div class="cd-sep">:</div>
+      <div class="cd-unit"><div class="cd-num" id="cdMin">--</div><div class="cd-label">Mins</div></div>
+      <div class="cd-sep">:</div>
+      <div class="cd-unit"><div class="cd-num" id="cdSec">--</div><div class="cd-label">Secs</div></div>
+    </div>
+    <div class="countdown-label">until this month's draw closes</div>
   </div>
-</div>
+</section>
+
+<div class="nav-spacer" style="height:0;"></div>
 
 <section class="section">
   <div class="container">
 
-    <!-- Points balance -->
-    <div style="background:linear-gradient(135deg,#f59e0b,#d97706);border-radius:var(--radius-2xl);padding:32px;color:white;text-align:center;margin-bottom:48px;box-shadow:0 8px 32px rgba(245,158,11,0.3);">
-      <div style="font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;opacity:0.85;margin-bottom:8px;">Your Points Balance</div>
-      <div style="font-size:64px;font-weight:900;line-height:1;" id="pointsDisplay">0</div>
-      <div style="opacity:0.8;margin-top:8px;font-size:15px;">points available to spend</div>
-      <a href="courses.html" style="display:inline-block;margin-top:20px;padding:10px 24px;background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.4);border-radius:999px;color:white;font-weight:600;font-size:14px;">Earn more points &#8594;</a>
+    <!-- ── USER STATUS BANNER ── -->
+    <div class="user-status-card not-eligible" id="userStatusCard" style="display:none;">
+      <div class="status-icon" id="statusIcon">⏳</div>
+      <div class="status-text">
+        <div class="status-title" id="statusTitle">Checking your rank…</div>
+        <div class="status-desc" id="statusDesc">Loading leaderboard data</div>
+      </div>
+      <div class="status-cta" id="statusCta"></div>
     </div>
 
-    <!-- How it works -->
-    <div style="background:var(--slate-100);border-radius:var(--radius-xl);padding:24px 32px;margin-bottom:48px;display:flex;align-items:center;gap:24px;flex-wrap:wrap;">
-      <div style="flex-shrink:0;">
-        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    <!-- ── PRIZE TIERS ── -->
+    <h2 style="font-size:28px;font-weight:900;text-align:center;margin-bottom:8px;">Prize Tiers This Month</h2>
+    <p style="text-align:center;color:var(--text-muted);margin-bottom:36px;">Rank in the top 100 to be automatically entered. Winners drawn on the last day of each month.</p>
+
+    <div class="tier-grid">
+
+      <!-- Platinum -->
+      <div class="tier-card platinum">
+        <span class="tier-crown">🏆</span>
+        <div class="tier-badge">Platinum</div>
+        <div class="tier-rank">Rank #1 – #10</div>
+        <div class="tier-prize">NT$2,000</div>
+        <div class="tier-prize-sub">Shopee / Amazon Gift Card</div>
+        <div class="tier-detail">One winner drawn from the top 10 learners. The higher your rank, the better your odds.</div>
+        <div class="auto-badge">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          Automatic entry
+        </div>
       </div>
+
+      <!-- Gold -->
+      <div class="tier-card gold">
+        <span class="tier-crown">🥇</span>
+        <div class="tier-badge">Gold</div>
+        <div class="tier-rank">Rank #11 – #50</div>
+        <div class="tier-prize">NT$500</div>
+        <div class="tier-prize-sub">Shopee / Amazon Gift Card</div>
+        <div class="tier-detail">One winner drawn from learners ranked 11 to 50. Keep grinding to improve your odds.</div>
+        <div class="auto-badge">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          Automatic entry
+        </div>
+      </div>
+
+      <!-- Silver -->
+      <div class="tier-card silver">
+        <span class="tier-crown">🥈</span>
+        <div class="tier-badge">Silver</div>
+        <div class="tier-rank">Rank #51 – #100</div>
+        <div class="tier-prize">NT$200</div>
+        <div class="tier-prize-sub">Shopee / Amazon Gift Card</div>
+        <div class="tier-detail">One winner drawn from learners ranked 51 to 100. A great reason to start your first course today.</div>
+        <div class="auto-badge">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          Automatic entry
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── HOW TO QUALIFY ── -->
+    <h2 style="font-size:24px;font-weight:900;text-align:center;margin-bottom:8px;">How to Qualify</h2>
+    <p style="text-align:center;color:var(--text-muted);margin-bottom:32px;">Four simple steps — no form to fill, no tickets to buy.</p>
+
+    <div class="steps-grid">
+      <div class="step-card">
+        <div class="step-num">1</div>
+        <div class="step-icon">📚</div>
+        <div class="step-title">Create a free account</div>
+        <div class="step-desc">Sign up for SkillQuest in under 60 seconds. It's completely free, forever.</div>
+      </div>
+      <div class="step-card">
+        <div class="step-num">2</div>
+        <div class="step-icon">🎯</div>
+        <div class="step-title">Complete courses</div>
+        <div class="step-desc">Finish lessons and score well on quizzes to earn points with every course you complete.</div>
+      </div>
+      <div class="step-card">
+        <div class="step-num">3</div>
+        <div class="step-icon">📈</div>
+        <div class="step-title">Climb the leaderboard</div>
+        <div class="step-desc">Rack up enough points to land in the top 10, 50, or 100 by end of month.</div>
+      </div>
+      <div class="step-card">
+        <div class="step-num">4</div>
+        <div class="step-icon">🎲</div>
+        <div class="step-title">We draw the winner</div>
+        <div class="step-desc">On the last day of each month, winners are drawn automatically and notified by email.</div>
+      </div>
+    </div>
+
+    <!-- ── POINTS BALANCE ── -->
+    <div style="background:linear-gradient(135deg,#2563eb,#7c3aed);border-radius:20px;padding:32px;color:white;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:24px;margin-bottom:64px;box-shadow:0 12px 40px rgba(37,99,235,0.3);">
       <div>
-        <h3 style="font-weight:700;margin-bottom:4px;">How It Works</h3>
-        <p style="color:var(--text-muted);font-size:14px;">Complete courses and score well on quizzes to earn points. Use your points to enter prize draws. Winners are selected randomly. Good luck!</p>
+        <div style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;opacity:0.75;margin-bottom:6px;">Your Points Balance</div>
+        <div style="font-size:52px;font-weight:900;line-height:1;" id="pointsDisplay">—</div>
+        <div style="opacity:0.65;margin-top:6px;font-size:14px;" id="pointsRankLine">Loading your rank…</div>
       </div>
-      <div style="display:flex;gap:20px;flex-wrap:wrap;margin-left:auto;align-items:center;">
-        <div style="text-align:center;">
-          <div style="display:flex;justify-content:center;margin-bottom:6px;">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-          </div>
-          <div style="font-size:12px;color:var(--text-muted);font-weight:600;">Complete Courses</div>
-        </div>
-        <div style="color:var(--slate-400);font-size:18px;font-weight:700;">&#8594;</div>
-        <div style="text-align:center;">
-          <div style="display:flex;justify-content:center;margin-bottom:6px;">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          </div>
-          <div style="font-size:12px;color:var(--text-muted);font-weight:600;">Earn Points</div>
-        </div>
-        <div style="color:var(--slate-400);font-size:18px;font-weight:700;">&#8594;</div>
-        <div style="text-align:center;">
-          <div style="display:flex;justify-content:center;margin-bottom:6px;">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
-          </div>
-          <div style="font-size:12px;color:var(--text-muted);font-weight:600;">Win Prizes</div>
-        </div>
+      <div style="display:flex;flex-direction:column;gap:12px;align-items:flex-end;">
+        <a href="courses.html" class="btn" style="background:rgba(255,255,255,0.15);color:white;border:1px solid rgba(255,255,255,0.3);backdrop-filter:blur(8px);">📚 Earn more points →</a>
+        <a href="leaderboard.html" class="btn" style="background:rgba(255,255,255,0.1);color:white;border:1px solid rgba(255,255,255,0.2);font-size:13px;">View full leaderboard →</a>
       </div>
     </div>
 
-    <!-- Prizes grid -->
-    <h2 style="font-size:24px;font-weight:800;margin-bottom:24px;">Available Prizes</h2>
-    <div class="subjects-grid" id="prizesGrid"></div>
-
-    <!-- Past Winners -->
-    <h2 style="font-size:24px;font-weight:800;margin:48px 0 24px;">Recent Winners</h2>
-    <div style="background:white;border-radius:var(--radius-xl);border:1px solid var(--slate-200);box-shadow:var(--shadow-sm);overflow:hidden;">
-      <div style="padding:16px 24px;border-bottom:1px solid var(--slate-200);display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);background:var(--slate-100);">
-        <span>Winner</span><span>Prize</span><span>Date</span>
-      </div>
-      <div style="padding:16px 24px;border-bottom:1px solid var(--slate-200);display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
-        <span style="font-weight:600;">Emma C.</span><span>NT$500 Gift Card</span><span style="color:var(--text-muted);font-size:13px;">May 2026</span>
-      </div>
-      <div style="padding:16px 24px;border-bottom:1px solid var(--slate-200);display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
-        <span style="font-weight:600;">Leo W.</span><span>1-Month Premium</span><span style="color:var(--text-muted);font-size:13px;">April 2026</span>
-      </div>
-      <div style="padding:16px 24px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
-        <span style="font-weight:600;">Sophia L.</span><span>SkillQuest Notebook</span><span style="color:var(--text-muted);font-size:13px;">April 2026</span>
-      </div>
+    <!-- ── POINTS HISTORY ── -->
+    <h2 style="font-size:22px;font-weight:800;margin-bottom:20px;">Recent Activity</h2>
+    <div id="pointsHistory" style="background:white;border-radius:20px;border:1px solid var(--slate-200);box-shadow:var(--shadow-sm);overflow:hidden;margin-bottom:64px;">
+      <div style="padding:32px;text-align:center;color:var(--text-muted);">Loading activity…</div>
     </div>
 
-    <!-- Points history -->
-    <h2 style="font-size:24px;font-weight:800;margin:48px 0 24px;">Points History</h2>
-    <div id="pointsHistory" style="background:white;border-radius:var(--radius-xl);border:1px solid var(--slate-200);box-shadow:var(--shadow-sm);overflow:hidden;"></div>
+    <!-- ── FAQ ── -->
+    <h2 style="font-size:22px;font-weight:800;margin-bottom:20px;">Frequently Asked Questions</h2>
+
+    <div class="faq-item" onclick="toggleFaq(this)">
+      <div class="faq-q">Is the lottery really free to enter?
+        <svg class="faq-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="faq-a">Yes, completely free. As long as you're in the top 100 on the leaderboard at the end of the month, you're automatically entered. No points to spend, no tickets to buy.</div>
+    </div>
+
+    <div class="faq-item" onclick="toggleFaq(this)">
+      <div class="faq-q">How are winners picked?
+        <svg class="faq-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="faq-a">One winner is drawn randomly from each tier (Platinum: top 10, Gold: rank 11–50, Silver: rank 51–100) on the last day of every month. A learner can only win one tier per month.</div>
+    </div>
+
+    <div class="faq-item" onclick="toggleFaq(this)">
+      <div class="faq-q">When and how are prizes delivered?
+        <svg class="faq-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="faq-a">Winners are notified by email within 24 hours of the draw. Gift card codes (Shopee or Amazon, winner's choice) are sent directly to the registered email address within 3 business days.</div>
+    </div>
+
+    <div class="faq-item" onclick="toggleFaq(this)">
+      <div class="faq-q">Can I win multiple tiers in the same month?
+        <svg class="faq-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="faq-a">No — each learner can only win one prize per month. If you rank in the top 10 you're entered in the Platinum draw only. If you win, you're excluded from lower tiers that month.</div>
+    </div>
+
+    <div class="faq-item" onclick="toggleFaq(this)">
+      <div class="faq-q">My rank changed near the end of the month — which rank counts?
+        <svg class="faq-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="faq-a">The leaderboard snapshot taken at 23:59 (Taiwan time, UTC+8) on the last day of the month determines eligibility. Keep earning points right up until the deadline!</div>
+    </div>
 
   </div>
 </section>
 
 <div id="footer"></div>
+
 <script src="js/api.js"></script>
-  <script src="js/seed.js"></script>
+<script src="js/seed.js"></script>
 <script src="js/data.js"></script>
 <script src="js/auth.js"></script>
 <script src="js/utils.js"></script>
@@ -104,75 +498,159 @@
   initPage();
 
   const user = getCurrentUser();
+  const token = typeof getToken === 'function' ? getToken() : null;
+  const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+    ? 'http://localhost:3000' : '';
+  const hdrs = token ? { Authorization: 'Bearer ' + token } : {};
 
-  // SVG icons for prizes
-  const prizeIcons = {
-    p1: '<svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>',
-    p2: '<svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>',
-    p3: '<svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',
-    p4: '<svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>'
-  };
-  const defaultPrizeIcon = '<svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>';
+  /* ── Countdown to end of month ── */
+  function updateCountdown() {
+    const now = new Date();
+    const end = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59); // last second of month
+    const diff = Math.max(0, end - now);
 
-  const starSvg = '<svg width="13" height="13" viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:3px;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>';
+    const days = Math.floor(diff / 86400000);
+    const hrs  = Math.floor((diff % 86400000) / 3600000);
+    const mins = Math.floor((diff % 3600000) / 60000);
+    const secs = Math.floor((diff % 60000) / 1000);
 
-  const ticketSvg = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v2z"/></svg>';
+    const pad = n => String(n).padStart(2, '0');
+    document.getElementById('cdDays').textContent = pad(days);
+    document.getElementById('cdHrs').textContent  = pad(hrs);
+    document.getElementById('cdMin').textContent  = pad(mins);
+    document.getElementById('cdSec').textContent  = pad(secs);
+  }
+  updateCountdown();
+  setInterval(updateCountdown, 1000);
 
-  function renderAll() {
-    const points = getUserPoints(user.id);
+  /* ── Load data ── */
+  async function loadPage() {
+    let points = typeof getUserPoints === 'function' ? getUserPoints(user.id) : 0;
+    let rank = null;
+
+    // Fetch points
+    try {
+      const r = await fetch(API_BASE + '/api/user/points', { headers: hdrs });
+      if (r.ok) { const d = await r.json(); points = d.points; }
+    } catch (_) {}
+
+    // Fetch leaderboard to determine rank
+    try {
+      const r = await fetch(API_BASE + '/api/leaderboard', { headers: hdrs });
+      if (r.ok) {
+        const lb = await r.json();
+        const idx = lb.findIndex(u => u.id === user.id);
+        if (idx >= 0) rank = idx + 1;
+      }
+    } catch (_) {}
+
+    // Points display
     document.getElementById('pointsDisplay').textContent = formatPoints(points);
 
-    // Prizes
-    document.getElementById('prizesGrid').innerHTML = LOTTERY_PRIZES.map(p => {
-      const canAfford = points >= p.pointsCost;
-      const icon = prizeIcons[p.id] || defaultPrizeIcon;
-      return `
-        <div class="prize-card">
-          <span class="prize-icon">${icon}</span>
-          <div class="prize-name">${p.name}</div>
-          <div class="prize-desc">${p.description}</div>
-          <div class="prize-cost">${starSvg}${formatPoints(p.pointsCost)} pts</div>
-          <div class="prize-remaining">${p.remaining} draws remaining</div>
-          <button class="btn btn-primary" style="width:100%;" ${!canAfford ? 'disabled title="Not enough points"' : ''}
-            onclick="enterDraw('${p.id}','${p.name}',${p.pointsCost})">
-            ${canAfford ? ticketSvg + 'Enter Draw' : 'Need ' + formatPoints(p.pointsCost - points) + ' more pts'}
-          </button>
-        </div>
-      `;
-    }).join('');
-
-    // Points log
-    const log = getPointsLog(user.id);
-    const hist = document.getElementById('pointsHistory');
-    if (log.length === 0) {
-      hist.innerHTML = '<div style="padding:32px;text-align:center;color:var(--text-muted);">No points earned yet. Complete your first quiz!</div>';
+    // Rank line
+    const rankLine = document.getElementById('pointsRankLine');
+    if (rank) {
+      let tierLabel = '';
+      if (rank <= 10)  tierLabel = ' · 🏆 Platinum tier';
+      else if (rank <= 50)  tierLabel = ' · 🥇 Gold tier';
+      else if (rank <= 100) tierLabel = ' · 🥈 Silver tier';
+      rankLine.textContent = 'Leaderboard rank #' + rank + tierLabel;
     } else {
-      hist.innerHTML = log.map(entry => {
-        const date = new Date(entry.date).toLocaleDateString();
-        return `
-          <div style="padding:14px 24px;border-bottom:1px solid var(--slate-200);display:flex;align-items:center;justify-content:space-between;gap:12px;">
-            <span style="font-size:14px;color:var(--text-muted);">${date}</span>
-            <span style="font-weight:600;color:var(--success);">+${entry.points} pts</span>
-            <span style="font-size:13px;color:var(--text-muted);">Total: ${formatPoints(entry.total)}</span>
-          </div>
-        `;
-      }).join('');
+      rankLine.textContent = 'Not yet ranked — complete courses to earn points!';
+    }
+
+    // User status banner
+    renderStatusBanner(rank, points);
+
+    // Activity / points history
+    await loadActivity();
+  }
+
+  function renderStatusBanner(rank, points) {
+    const card = document.getElementById('userStatusCard');
+    card.style.display = 'flex';
+
+    if (rank && rank <= 100) {
+      card.className = 'user-status-card eligible';
+
+      let tier, prize, emoji;
+      if (rank <= 10)       { tier = 'Platinum'; prize = 'NT$2,000'; emoji = '🏆'; }
+      else if (rank <= 50)  { tier = 'Gold';     prize = 'NT$500';   emoji = '🥇'; }
+      else                  { tier = 'Silver';   prize = 'NT$200';   emoji = '🥈'; }
+
+      document.getElementById('statusIcon').textContent = emoji;
+      document.getElementById('statusIcon').style.background = 'rgba(52,211,153,0.15)';
+      document.getElementById('statusTitle').style.color = 'white';
+      document.getElementById('statusTitle').textContent = `You're in the ${tier} tier! (Rank #${rank})`;
+      document.getElementById('statusDesc').style.color = 'rgba(255,255,255,0.65)';
+      document.getElementById('statusDesc').textContent =
+        `You're automatically entered in the ${tier} draw for a ${prize} gift card. Keep learning to protect your rank!`;
+      document.getElementById('statusCta').innerHTML =
+        `<a href="leaderboard.html" class="btn" style="background:rgba(255,255,255,0.15);color:white;border:1px solid rgba(255,255,255,0.3);">View leaderboard →</a>`;
+
+    } else {
+      card.className = 'user-status-card not-eligible';
+
+      const needed = rank ? `You're ranked #${rank} — reach top 100 to enter.` : `You haven't earned any points yet.`;
+      document.getElementById('statusIcon').textContent = '💪';
+      document.getElementById('statusIcon').style.background = 'var(--slate-200)';
+      document.getElementById('statusTitle').style.color = 'var(--text-primary)';
+      document.getElementById('statusTitle').textContent = 'You\'re not in the top 100 yet';
+      document.getElementById('statusDesc').style.color = 'var(--text-muted)';
+      document.getElementById('statusDesc').textContent = needed + ' Complete more courses to climb the leaderboard!';
+      document.getElementById('statusCta').innerHTML =
+        `<a href="courses.html" class="btn btn-primary">Start earning points →</a>`;
     }
   }
 
-  function enterDraw(prizeId, prizeName, cost) {
-    const current = getUserPoints(user.id);
-    if (current < cost) {
-      showToast('Not enough points!', 'error');
+  async function loadActivity() {
+    const hist = document.getElementById('pointsHistory');
+    let activity = [];
+
+    // Try backend
+    try {
+      const r = await fetch(API_BASE + '/api/user/activity', { headers: hdrs });
+      if (r.ok) { activity = await r.json(); }
+    } catch (_) {}
+
+    // Fallback to localStorage
+    if (!activity.length && typeof getPointsLog === 'function') {
+      activity = getPointsLog(user.id).map(e => ({
+        description: 'Quiz completed',
+        points: e.points,
+        created_at: e.date
+      }));
+    }
+
+    if (!activity.length) {
+      hist.innerHTML = '<div style="padding:32px;text-align:center;color:var(--text-muted);">No activity yet. Complete your first quiz to earn points!</div>';
       return;
     }
-    deductUserPoints(user.id, cost);
-    showToast('You entered the draw for ' + prizeName + '! Good luck!', 'success');
-    renderAll();
+
+    hist.innerHTML = activity.slice(0, 20).map(a => {
+      const date = new Date(a.created_at || a.date).toLocaleDateString('en-TW', { month: 'short', day: 'numeric' });
+      return `
+        <div class="history-row">
+          <span style="font-size:18px;">⭐</span>
+          <span class="activity-name">${escHtml(a.description || 'Activity')}</span>
+          <span class="activity-pts">+${formatPoints(a.points)} pts</span>
+          <span class="activity-date">${date}</span>
+        </div>`;
+    }).join('');
   }
 
-  window.enterDraw = enterDraw;
-  renderAll();
+  function escHtml(s) {
+    return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  /* ── FAQ toggle ── */
+  function toggleFaq(item) {
+    const wasOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item.open').forEach(i => i.classList.remove('open'));
+    if (!wasOpen) item.classList.add('open');
+  }
+
+  loadPage();
 </script>
 </body>
 </html>
