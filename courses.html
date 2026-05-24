@@ -214,16 +214,17 @@
   function filterSubjects(query) {
     const q = query.toLowerCase().trim();
     if (!q) { renderSubjects(SUBJECTS); return; }
-    // Match if any word in the title starts with the query (word-prefix),
-    // or the full title/course title contains the query as a substring.
-    // Only match against titles — not descriptions — to avoid false positives.
-    function titleMatches(title) {
-      const t = title.toLowerCase();
+    // Match against title text OR the subject/course id.
+    // Matching the id handles cases like "finance" → subject id "finance"
+    // even though "finance" is not a substring of "Financial Literacy".
+    function textMatches(text) {
+      const t = text.toLowerCase();
       return t.includes(q) || t.split(/\s+/).some(word => word.startsWith(q));
     }
     const filtered = SUBJECTS.filter(s =>
-      titleMatches(s.title) ||
-      s.courses.some(c => titleMatches(c.title))
+      textMatches(s.title) ||
+      s.id.toLowerCase().includes(q) ||
+      s.courses.some(c => textMatches(c.title) || c.id.toLowerCase().includes(q))
     );
     renderSubjects(filtered);
   }

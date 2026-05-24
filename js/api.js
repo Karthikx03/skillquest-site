@@ -68,14 +68,21 @@ const API = (() => {
 
   /* ── Points ───────────────────────────────────────────── */
   async function getPoints(userId) {
+    const localPoints = parseInt(localStorage.getItem('sq_points_' + userId) || '0');
     const res = await req('GET', '/user/points');
     if (res.ok) {
-      // Sync back to localStorage so legacy code still works
-      localStorage.setItem('sq_points_' + userId, res.data.points);
-      return res.data.points;
+      const backendPoints = res.data.points || 0;
+      // Never let a stale backend wipe local progress — use the higher value
+      const maxPoints = Math.max(backendPoints, localPoints);
+      localStorage.setItem('sq_points_' + userId, maxPoints);
+      // If local is ahead (backend missed a fire-and-forget), push the delta up now
+      if (localPoints > backendPoints && localPoints > 0) {
+        const diff = localPoints - backendPoints;
+        await req('POST', '/user/points/add', { points: diff, note: 'sync' }).catch(() => {});
+      }
+      return maxPoints;
     }
-    // Fallback
-    return parseInt(localStorage.getItem('sq_points_' + userId) || '0');
+    return localPoints;
   }
 
   async function addPoints(userId, points, note) {
@@ -98,13 +105,32 @@ const API = (() => {
 
   /* ── Progress ─────────────────────────────────────────── */
   async function getProgress(userId) {
+    const localProgress = JSON.parse(localStorage.getItem('sq_progress_' + userId) || '{}');
     const res = await req('GET', '/user/progress');
     if (res.ok) {
-      // Sync back to localStorage so legacy code still works
-      localStorage.setItem('sq_progress_' + userId, JSON.stringify(res.data));
-      return res.data;
+      const backendProgress = res.data || {};
+      // Merge: start from local (most up-to-date), then fill in any backend-only entries
+      const merged = JSON.parse(JSON.stringify(localProgress));
+      for (const sid in backendProgress) {
+        if (!merged[sid]) merged[sid] = {};
+        for (const cid in backendProgress[sid]) {
+          if (!merged[sid][cid]) merged[sid][cid] = backendProgress[sid][cid];
+        }
+      }
+      // Push any local-only completed courses up to backend (missed fire-and-forget)
+      for (const sid in localProgress) {
+        for (const cid in localProgress[sid]) {
+          const lc = localProgress[sid][cid];
+          const bc = backendProgress[sid] && backendProgress[sid][cid];
+          if (!bc || (lc.completed && !bc.completed)) {
+            req('PUT', '/user/progress', { subjectId: sid, courseId: cid, data: lc }).catch(() => {});
+          }
+        }
+      }
+      localStorage.setItem('sq_progress_' + userId, JSON.stringify(merged));
+      return merged;
     }
-    return JSON.parse(localStorage.getItem('sq_progress_' + userId) || '{}');
+    return localProgress;
   }
 
   async function saveProgress(userId, progress) {

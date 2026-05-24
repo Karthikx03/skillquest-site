@@ -227,16 +227,51 @@ function getDifficultyColor(d) {
   return { Beginner:'#10b981', Intermediate:'#f59e0b', Advanced:'#ef4444' }[d] || '#6b7280';
 }
 
-/* ---- Data sync: hydrate localStorage from backend for logged-in users ---- */
+/* ---- Data sync: bidirectional — backend→local AND local→backend ---- */
 async function syncUserData() {
   const user = (typeof getCurrentUser === 'function') ? getCurrentUser() : null;
-  if (!user) return;
-  if (typeof API === 'undefined') return;
+  if (!user || typeof API === 'undefined') return;
   try {
+    // getPoints and getProgress now merge rather than overwrite, and push
+    // any local-only data up to the backend (catches missed fire-and-forgets)
     await Promise.allSettled([
-      API.getProgress(user.id),          // already writes to localStorage on success
-      API.getPoints(user.id)             // now also writes to localStorage on success
+      API.getProgress(user.id),
+      API.getPoints(user.id),
+      _syncActivityToBackend(user.id)
     ]);
+  } catch (_) {}
+}
+
+async function _syncActivityToBackend(userId) {
+  try {
+    const token = typeof API !== 'undefined' ? API.getToken() : null;
+    if (!token) return;
+    const base = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+      ? 'http://localhost:3000' : '';
+    const hdrs = { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' };
+
+    const res = await fetch(base + '/api/user/activity', { headers: hdrs });
+    if (!res.ok) return;
+    const backendActivity = await res.json();
+
+    // Only push if backend has no activity but local does
+    if (backendActivity.length === 0) {
+      const localActivity = JSON.parse(localStorage.getItem('sq_activity_' + userId) || '[]');
+      for (const a of localActivity.slice(0, 10)) {
+        if (!a.subjectId || !a.courseId) continue;
+        fetch(base + '/api/user/activity', {
+          method: 'POST',
+          headers: hdrs,
+          body: JSON.stringify({
+            subjectId: a.subjectId,
+            courseId:  a.courseId,
+            score:     a.score        || 0,
+            totalQuestions: a.totalQuestions || 5,
+            pointsEarned:   a.points  || 0
+          })
+        }).catch(() => {});
+      }
+    }
   } catch (_) {}
 }
 

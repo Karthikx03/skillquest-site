@@ -108,23 +108,31 @@
       fetch(API_BASE + '/api/leaderboard',   { headers: hdrs })
     ]);
 
-    // Points — backend is authoritative
+    // Points — use max(backend, localStorage) so a stale backend never shows 0
     let points = getUserPoints(user.id);
     if (ptRes.status === 'fulfilled' && ptRes.value.ok) {
       const d = await ptRes.value.json();
-      points  = d.points;
+      points = Math.max(points, d.points || 0);
     }
 
-    // Progress
+    // Progress — merge backend into local so neither source wipes the other
     let progress = getProgress(user.id);
     if (prRes.status === 'fulfilled' && prRes.value.ok) {
-      progress = await prRes.value.json();
+      const backendProgress = await prRes.value.json();
+      // Fill in any backend-only entries without overwriting local ones
+      for (const sid in backendProgress) {
+        if (!progress[sid]) progress[sid] = {};
+        for (const cid in backendProgress[sid]) {
+          if (!progress[sid][cid]) progress[sid][cid] = backendProgress[sid][cid];
+        }
+      }
     }
 
-    // Activity
+    // Activity — only replace local with backend if backend actually has entries
     let recentActivity = getRecentActivity(user.id);
     if (acRes.status === 'fulfilled' && acRes.value.ok) {
-      recentActivity = await acRes.value.json();
+      const backendActivity = await acRes.value.json();
+      if (backendActivity.length > 0) recentActivity = backendActivity;
     }
 
     // Leaderboard rank
