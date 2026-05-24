@@ -135,13 +135,13 @@ const API = (() => {
   }
 
   /* ── Contact ──────────────────────────────────────────── */
-  async function submitContact({ name, email, type, message }) {
+  async function submitContact({ name, email, type, subject, message }) {
     // Always save locally first
     const contacts = JSON.parse(localStorage.getItem('sq_contacts') || '[]');
-    contacts.push({ name, email, type, message, date: new Date().toISOString() });
+    contacts.push({ name, email, type, subject: subject || '', message, date: new Date().toISOString() });
     localStorage.setItem('sq_contacts', JSON.stringify(contacts));
-    // Then try backend
-    return req('POST', '/contact', { name, email, type, message });
+    // Then send to backend
+    return req('POST', '/contact', { name, email, type, subject: subject || '', message });
   }
 
   /* ── Private helpers ──────────────────────────────────── */

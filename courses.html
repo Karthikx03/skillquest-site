@@ -214,10 +214,16 @@
   function filterSubjects(query) {
     const q = query.toLowerCase().trim();
     if (!q) { renderSubjects(SUBJECTS); return; }
+    // Match if any word in the title starts with the query (word-prefix),
+    // or the full title/course title contains the query as a substring.
+    // Only match against titles — not descriptions — to avoid false positives.
+    function titleMatches(title) {
+      const t = title.toLowerCase();
+      return t.includes(q) || t.split(/\s+/).some(word => word.startsWith(q));
+    }
     const filtered = SUBJECTS.filter(s =>
-      s.title.toLowerCase().includes(q) ||
-      s.description.toLowerCase().includes(q) ||
-      s.courses.some(c => c.title.toLowerCase().includes(q) || (c.description||'').toLowerCase().includes(q))
+      titleMatches(s.title) ||
+      s.courses.some(c => titleMatches(c.title))
     );
     renderSubjects(filtered);
   }

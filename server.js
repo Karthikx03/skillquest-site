@@ -331,6 +331,7 @@ app.get('/api/stats', async (_req, res) => {
     res.json({
       totalUsers:       Number(userRow.total),
       totalCompletions: Number(completionRow.total),
+      totalQuizzes:     Number(completionRow.total),
       totalPoints:      Number(pointsRow.total),
       activeStudents:   Number(activityRow.total)
     });

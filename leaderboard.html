@@ -131,16 +131,20 @@
     empty.style.display = 'none';
 
     const myIndex = active.findIndex(u => user && u.id === user.id);
-    const myRank  = myIndex + 1;
+    const myRank  = myIndex >= 0 ? myIndex + 1 : null;
 
     if (user) {
-      const myData = active[myIndex] || { points: 0, coursesCompleted: 0 };
+      const myData = myIndex >= 0 ? active[myIndex] : null;
       myCard.style.display = 'flex';
-      document.getElementById('myRankNum').textContent    = myRank ? '#' + myRank : '--';
-      document.getElementById('myRankName').textContent   = user.name;
-      const myCC = myData.coursesCompleted || 0;
-      document.getElementById('myRankPoints').textContent =
-        formatPoints(myData.points) + ' points · ' + myCC + ' course' + (myCC === 1 ? '' : 's') + ' completed';
+      document.getElementById('myRankNum').textContent  = myRank ? '#' + myRank : '--';
+      document.getElementById('myRankName').textContent = user.name;
+      if (myData) {
+        const myCC = myData.coursesCompleted || 0;
+        document.getElementById('myRankPoints').textContent =
+          formatPoints(myData.points) + ' points · ' + myCC + ' course' + (myCC === 1 ? '' : 's') + ' completed';
+      } else {
+        document.getElementById('myRankPoints').textContent = 'Complete a course to earn points and join the leaderboard';
+      }
     }
 
     document.getElementById('leaderboardRows').innerHTML = active.map((u, i) => {

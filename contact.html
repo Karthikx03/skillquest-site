@@ -165,11 +165,11 @@
     }
   }
 
-  function submitContact(e) {
+  async function submitContact(e) {
     e.preventDefault();
-    const name = document.getElementById('cName').value.trim();
-    const email = document.getElementById('cEmail').value.trim();
-    const type = document.getElementById('cType').value;
+    const name    = document.getElementById('cName').value.trim();
+    const email   = document.getElementById('cEmail').value.trim();
+    const type    = document.getElementById('cType').value;
     const subject = document.getElementById('cSubject').value.trim();
     const message = document.getElementById('cMessage').value.trim();
 
@@ -178,13 +178,23 @@
       return;
     }
 
-    const contacts = JSON.parse(localStorage.getItem('sq_contacts') || '[]');
-    contacts.push({ name, email, type, subject, message, date: new Date().toISOString() });
-    localStorage.setItem('sq_contacts', JSON.stringify(contacts));
+    const btn = document.querySelector('#contactForm button[type="submit"]');
+    if (btn) { btn.disabled = true; btn.textContent = 'Sending…'; }
 
-    document.getElementById('contactForm').reset();
-    document.getElementById('contactSuccess').style.display = 'block';
-    showToast('Message sent! Thank you for reaching out.', 'success');
+    try {
+      const res = await API.submitContact({ name, email, type, subject, message });
+      if (res && res.ok) {
+        document.getElementById('contactForm').reset();
+        document.getElementById('contactSuccess').style.display = 'block';
+        showToast('Message sent! Thank you for reaching out.', 'success');
+      } else {
+        showToast('Could not send message. Please email us at skillquest@uedu.tw', 'error');
+      }
+    } catch (_) {
+      showToast('Could not send message. Please email us at skillquest@uedu.tw', 'error');
+    } finally {
+      if (btn) { btn.disabled = false; btn.textContent = 'Send Message'; }
+    }
   }
 </script>
 </body>
