@@ -589,11 +589,11 @@
   requireAuth();
   initPage();
 
-  const user   = getCurrentUser();
-  const token  = typeof getToken === 'function' ? getToken() : null;
-  const API    = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+  const user    = getCurrentUser();
+  const token   = typeof getToken === 'function' ? getToken() : null;
+  const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
                    ? 'http://localhost:3000' : '';
-  const hdrs   = token ? { Authorization: 'Bearer ' + token } : {};
+  const hdrs    = token ? { Authorization: 'Bearer ' + token } : {};
 
   /* ── Countdown ── */
   function tick() {
@@ -610,16 +610,32 @@
 
   /* ── Load page data ── */
   async function loadPage() {
+    // Timeout fallback: if data doesn't arrive in 5s, show a safe default
+    const fallbackTimer = setTimeout(() => {
+      const ptsEl  = document.getElementById('ptsAmount');
+      const ptsSub = document.getElementById('ptsSub');
+      const card   = document.getElementById('eligCard');
+      if (ptsEl && ptsEl.textContent === '—') {
+        ptsEl.textContent = '0';
+        if (ptsSub) ptsSub.textContent = 'Complete a course to earn points and enter the draw';
+      }
+      if (card && card.style.display === 'none') renderEligibility(null, 0);
+      const log = document.getElementById('activityLog');
+      if (log && log.querySelector('[style*="Loading"]')) {
+        log.innerHTML = '<div style="padding:32px;text-align:center;color:var(--text-muted);font-size:14px;">No quiz activity yet. Complete your first course to start earning points.</div>';
+      }
+    }, 5000);
+
     let points = typeof getUserPoints === 'function' ? getUserPoints(user.id) : 0;
     let rank   = null;
 
     try {
-      const r = await fetch(API + '/api/user/points', { headers: hdrs });
+      const r = await fetch(API_BASE + '/api/user/points', { headers: hdrs });
       if (r.ok) { const d = await r.json(); points = d.points; }
     } catch (_) {}
 
     try {
-      const r = await fetch(API + '/api/leaderboard', { headers: hdrs });
+      const r = await fetch(API_BASE + '/api/leaderboard', { headers: hdrs });
       if (r.ok) {
         const lb = await r.json();
         const i  = lb.findIndex(u => u.id === user.id);
@@ -627,6 +643,7 @@
       }
     } catch (_) {}
 
+    clearTimeout(fallbackTimer);
     renderPoints(points, rank);
     renderEligibility(rank, points);
     await renderActivity();
@@ -674,7 +691,7 @@
     let activity = [];
 
     try {
-      const r = await fetch(API + '/api/user/activity', { headers: hdrs });
+      const r = await fetch(API_BASE + '/api/user/activity', { headers: hdrs });
       if (r.ok) activity = await r.json();
     } catch (_) {}
 

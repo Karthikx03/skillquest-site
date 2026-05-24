@@ -1365,7 +1365,7 @@ function renderOverview() {
                   </div>
                 </td>
                 <td><strong>${fmtNum(u.points || 0)}</strong></td>
-                <td>${u.coursesCompleted || 0} courses</td>
+                <td>${(u.coursesCompleted || 0) === 1 ? '1 course' : (u.coursesCompleted || 0) + ' courses'}</td>
                 <td>${fmtDate(u.joined)}</td>
               </tr>
             `).join('')}
@@ -1450,7 +1450,7 @@ function renderUsersTable() {
           <strong style="color:var(--primary);">${fmtNum(u.points || 0)}</strong>
           <span style="font-size:12px;color:var(--text-muted);"> pts</span>
         </td>
-        <td>${u.coursesCompleted || 0} courses</td>
+        <td>${(u.coursesCompleted || 0) === 1 ? '1 course' : (u.coursesCompleted || 0) + ' courses'}</td>
         <td>${u.lastActive ? fmtDate(u.lastActive) : '<span style="color:var(--slate-400);">Never</span>'}</td>
         <td>${fmtDate(u.joined)}</td>
         <td>${statusBadge}</td>
@@ -1524,7 +1524,7 @@ function renderLeaderboard() {
           </div>
         </td>
         <td><strong style="color:var(--primary);">${fmtNum(u.points||0)}</strong></td>
-        <td>${u.coursesCompleted||0} courses</td>
+        <td>${(u.coursesCompleted || 0) === 1 ? '1 course' : (u.coursesCompleted || 0) + ' courses'}</td>
         <td>${u.lastActive ? fmtDate(u.lastActive) : '<span style="color:var(--slate-400);">—</span>'}</td>
       </tr>
     `;

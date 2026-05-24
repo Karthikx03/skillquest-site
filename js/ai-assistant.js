@@ -19,15 +19,15 @@
       id: 'greeting',
       test: s => /\b(hello|^hi$|hey|howdy|good\s(morning|afternoon|evening)|what can you|help me|who are you|start)\b/.test(s),
       reply: ctx => ({
-        text: `Hi${ctx.firstName ? ' ' + ctx.firstName : ''}! I'm ${ASSISTANT_NAME}, your SkillQuest guide.\n\nI can help you find courses, understand the monthly prize draw, check your rank, or navigate anywhere on the platform. What would you like to know?`,
-        chips: ['How do I earn points?', 'About the monthly draw', 'What courses are here?', 'How do certificates work?']
+        text: `Hi${ctx.firstName ? ' ' + ctx.firstName : ''}! I'm ${ASSISTANT_NAME}, your SkillQuest guide. Ask me about courses, how to earn points, the monthly prize draw, certificates, or anything else on the platform.`,
+        chips: ['How do I earn points?', 'About the monthly draw', 'What courses are here?', 'Tell me about certificates']
       })
     },
     {
       id: 'points',
       test: s => /\bpoints?\b|\bearn\b|\bscor(e|ing)\b|\baccumulate\b|\bhow.*get.*points\b|\bpoints.*earn\b/.test(s),
       reply: () => ({
-        text: `Points are earned by completing courses and passing quizzes:\n\n• Pass any quiz with 60%+ to earn points\n• Higher scores earn proportionally more points\n• Your total points determine your leaderboard rank\n• Ranking in the top 100 enters you in the monthly prize draw automatically`,
+        text: `Pass any quiz with 60% or above to earn points — score higher and you earn proportionally more. Your total points determine your leaderboard rank, and ranking in the top 100 by end of month automatically enters you in the monthly prize draw with no sign-up required.`,
         chips: ['Tell me about the monthly draw', 'Browse courses', 'View the leaderboard'],
         links: [{ label: 'My Dashboard', url: 'dashboard.html' }, { label: 'Browse Courses', url: 'courses.html' }]
       })
@@ -36,7 +36,7 @@
       id: 'courses-general',
       test: s => /\bcourses?\b|\blessons?\b|\blearn\b|\bstudy\b|\bsubjects?\b|\bavailable\b|\bbrowse\b|\bwhat.*teach\b|\b36\b|\bhow many\b/.test(s),
       reply: () => ({
-        text: `SkillQuest has 36 free courses across 6 subjects:\n\n• Financial Literacy — budgeting, credit, investing\n• AI Fundamentals — how AI & ML work\n• Cybersecurity — online safety and privacy\n• Digital Skills — productivity & data tools\n• Career Readiness — CVs, interviews, networking\n• Entrepreneurship — idea validation, lean startup\n\nAll courses are self-paced and include a scored quiz.`,
+        text: `SkillQuest has 36 free courses across 6 subjects: Financial Literacy, AI Fundamentals, Cybersecurity, Digital Skills, Career Readiness, and Entrepreneurship. All are self-paced and each ends with a scored quiz. Which subject interests you?`,
         chips: ['Financial Literacy', 'AI Fundamentals', 'Career Readiness', 'Cybersecurity'],
         links: [{ label: 'Browse All Courses', url: 'courses.html' }]
       })
@@ -93,7 +93,7 @@
       id: 'monthly-draw',
       test: s => /\blottery\b|\bprize\b|\bdraw\b|\breward|\bgift card\b|\bwin\b|\bcash\b|\bnt\$|\bmonthly\b|\bplatinum\b|\bgold tier\b|\bsilver tier\b|\bqualif|\beligible\b/.test(s),
       reply: () => ({
-        text: `The Monthly Prize Draw automatically enters the top 100 learners every month — no sign-up required:\n\n• Rank 1–10 → NT$2,000 gift card  (Platinum)\n• Rank 11–50 → NT$500 gift card  (Gold)\n• Rank 51–100 → NT$200 gift card  (Silver)\n\nWinners are drawn on the last day of each month and notified by email within 24 hours.`,
+        text: `The Monthly Prize Draw automatically enters the top 100 learners every month — no sign-up or ticket required. Rank 1–10 goes into the Platinum draw (NT$2,000 gift card), ranks 11–50 into Gold (NT$500), and ranks 51–100 into Silver (NT$200). One winner is drawn from each tier on the last day of the month and notified by email within 24 hours.`,
         chips: ['How do I rank higher?', 'View the leaderboard', 'How do I earn points?'],
         links: [{ label: 'Monthly Draw Details', url: 'rewards.html' }, { label: 'View Leaderboard', url: 'leaderboard.html' }]
       })
@@ -167,7 +167,7 @@
       id: 'quiz',
       test: s => /\bquiz\b|\btest\b|\bquestion\b|\banswer\b|\bmultiple choice\b|\battempt\b|\bretake\b|\bassessment\b|\bexam\b/.test(s),
       reply: () => ({
-        text: `Each course ends with a multiple-choice quiz:\n\n• Score 60%+ to earn points for your leaderboard rank\n• Score 80%+ to unlock a certificate of completion\n• Retakes are unlimited — improve your score any time`
+        text: `Each course ends with a multiple-choice quiz. Score 60% or above to earn points toward your leaderboard rank. Score 80% or above to unlock a printable certificate of completion. Retakes are unlimited, so you can come back and improve any time.`
       })
     },
     {

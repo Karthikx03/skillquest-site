@@ -37,9 +37,22 @@ function renderNav() {
         <a href="index.html" class="nav-logo" aria-label="SkillQuest home">
           <div class="logo-icon" aria-hidden="true">
             <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M11 2L4 6v5c0 4.1 2.9 7.9 7 9 4.1-1.1 7-4.9 7-9V6L11 2z" fill="white" fill-opacity="0.25"/>
-              <path d="M11 2L4 6v5c0 4.1 2.9 7.9 7 9 4.1-1.1 7-4.9 7-9V6L11 2z" stroke="white" stroke-width="1.4" stroke-linejoin="round"/>
-              <path d="M8.5 11l1.8 1.8L14 8.5" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+              <!-- 3D depth shadow layer -->
+              <path d="M11 2.8L4.6 6.4v4.8c0 3.8 2.6 7.3 6.4 8.3 3.8-1 6.4-4.5 6.4-8.3V6.4L11 2.8z" fill="white" fill-opacity="0.07" transform="translate(0.3,0.5)"/>
+              <!-- Main shield body -->
+              <g class="sq-shield-group">
+                <path d="M11 2L4 6v5c0 4.1 2.9 7.9 7 9 4.1-1.1 7-4.9 7-9V6L11 2z" fill="white" fill-opacity="0.22"/>
+                <!-- Top-face highlight for 3D look -->
+                <path d="M11 2L4 6l7 2.2 7-2.2L11 2z" fill="white" fill-opacity="0.28"/>
+                <!-- Left-face subtle shade -->
+                <path d="M4 6v5c0 2.8 1.2 5.4 3.3 7.2L4 6z" fill="white" fill-opacity="0.05"/>
+                <!-- Shield border -->
+                <path d="M11 2L4 6v5c0 4.1 2.9 7.9 7 9 4.1-1.1 7-4.9 7-9V6L11 2z" stroke="white" stroke-width="1.4" stroke-linejoin="round"/>
+                <!-- Inner edge highlight -->
+                <path d="M11 3L4.7 6.5v4.6c0 3.6 2.5 7 6.3 8.1 3.8-1.1 6.3-4.5 6.3-8.1V6.5L11 3z" stroke="white" stroke-width="0.35" stroke-opacity="0.35" stroke-linejoin="round"/>
+              </g>
+              <!-- Glowing checkmark -->
+              <path class="sq-check" d="M8.5 11l1.8 1.8L14 8.5" stroke="white" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
           </div>
           <div class="logo-text">
@@ -97,9 +110,15 @@ function renderFooter() {
             <a href="index.html" class="footer-logo" style="display:flex;align-items:center;gap:10px;margin-bottom:16px;text-decoration:none;" aria-label="SkillQuest home">
               <div class="logo-icon" aria-hidden="true">
                 <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M11 2L4 6v5c0 4.1 2.9 7.9 7 9 4.1-1.1 7-4.9 7-9V6L11 2z" fill="white" fill-opacity="0.25"/>
-                  <path d="M11 2L4 6v5c0 4.1 2.9 7.9 7 9 4.1-1.1 7-4.9 7-9V6L11 2z" stroke="white" stroke-width="1.4" stroke-linejoin="round"/>
-                  <path d="M8.5 11l1.8 1.8L14 8.5" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M11 2.8L4.6 6.4v4.8c0 3.8 2.6 7.3 6.4 8.3 3.8-1 6.4-4.5 6.4-8.3V6.4L11 2.8z" fill="white" fill-opacity="0.07" transform="translate(0.3,0.5)"/>
+                  <g class="sq-shield-group">
+                    <path d="M11 2L4 6v5c0 4.1 2.9 7.9 7 9 4.1-1.1 7-4.9 7-9V6L11 2z" fill="white" fill-opacity="0.22"/>
+                    <path d="M11 2L4 6l7 2.2 7-2.2L11 2z" fill="white" fill-opacity="0.28"/>
+                    <path d="M4 6v5c0 2.8 1.2 5.4 3.3 7.2L4 6z" fill="white" fill-opacity="0.05"/>
+                    <path d="M11 2L4 6v5c0 4.1 2.9 7.9 7 9 4.1-1.1 7-4.9 7-9V6L11 2z" stroke="white" stroke-width="1.4" stroke-linejoin="round"/>
+                    <path d="M11 3L4.7 6.5v4.6c0 3.6 2.5 7 6.3 8.1 3.8-1.1 6.3-4.5 6.3-8.1V6.5L11 3z" stroke="white" stroke-width="0.35" stroke-opacity="0.35" stroke-linejoin="round"/>
+                  </g>
+                  <path class="sq-check" d="M8.5 11l1.8 1.8L14 8.5" stroke="white" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
               </div>
               <span class="logo-title" style="color:white;font-size:18px;font-weight:800;">SkillQuest</span>
@@ -208,10 +227,26 @@ function getDifficultyColor(d) {
   return { Beginner:'#10b981', Intermediate:'#f59e0b', Advanced:'#ef4444' }[d] || '#6b7280';
 }
 
+/* ---- Data sync: hydrate localStorage from backend for logged-in users ---- */
+async function syncUserData() {
+  const user = (typeof getCurrentUser === 'function') ? getCurrentUser() : null;
+  if (!user) return;
+  if (typeof API === 'undefined') return;
+  try {
+    await Promise.allSettled([
+      API.getProgress(user.id),          // already writes to localStorage on success
+      API.getPoints(user.id)             // now also writes to localStorage on success
+    ]);
+  } catch (_) {}
+}
+
 /* ---- Page init ---- */
 function initPage() {
   renderNav();
   renderFooter();
+
+  /* Sync backend data to localStorage on every page load (silent, best-effort) */
+  syncUserData();
 
   /* Inject AI assistant script once (on all pages) */
   if (!document.getElementById('sq-ai-script')) {
@@ -274,6 +309,41 @@ function initPage() {
     @keyframes fadeOut      { from { opacity:1; } to { opacity:0;transform:translateY(8px); } }
     .toast-close { background:none;border:none;color:#fff;cursor:pointer;font-size:18px;padding:0;margin-left:4px;opacity:0.8;line-height:1; }
     .toast-close:hover { opacity:1; }
+
+    /* ── Animated logo ── */
+    @keyframes sq-logo-glow {
+      0%,100% { box-shadow:0 4px 14px rgba(79,70,229,0.35); }
+      50%      { box-shadow:0 6px 24px rgba(79,70,229,0.65),0 0 0 4px rgba(99,102,241,0.15); }
+    }
+    @keyframes sq-shield-float {
+      0%,100% { transform:translateY(0) rotate(0deg); }
+      50%      { transform:translateY(-1.5px) rotate(0.3deg); }
+    }
+    @keyframes sq-check-pulse {
+      0%,100% { opacity:0.75;stroke-width:1.6; }
+      50%      { opacity:1;stroke-width:1.9; }
+    }
+    @keyframes sq-shine-sweep {
+      0%   { opacity:0;transform:translateX(-120%) skewX(-15deg); }
+      40%  { opacity:1; }
+      100% { opacity:0;transform:translateX(120%) skewX(-15deg); }
+    }
+    .logo-icon {
+      animation: sq-logo-glow 3s ease-in-out infinite;
+      position: relative;
+      overflow: hidden;
+    }
+    .logo-icon::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(105deg, transparent 20%, rgba(255,255,255,0.22) 50%, transparent 80%);
+      animation: sq-shine-sweep 4s ease-in-out infinite 1s;
+      pointer-events: none;
+      border-radius: inherit;
+    }
+    .sq-shield-group { animation: sq-shield-float 3.5s ease-in-out infinite; transform-box:fill-box; transform-origin:center; }
+    .sq-check        { animation: sq-check-pulse 2s ease-in-out infinite; }
   `;
   document.head.appendChild(s);
 })();

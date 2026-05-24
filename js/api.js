@@ -69,7 +69,11 @@ const API = (() => {
   /* ── Points ───────────────────────────────────────────── */
   async function getPoints(userId) {
     const res = await req('GET', '/user/points');
-    if (res.ok) return res.data.points;
+    if (res.ok) {
+      // Sync back to localStorage so legacy code still works
+      localStorage.setItem('sq_points_' + userId, res.data.points);
+      return res.data.points;
+    }
     // Fallback
     return parseInt(localStorage.getItem('sq_points_' + userId) || '0');
   }

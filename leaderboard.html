@@ -138,8 +138,9 @@
       myCard.style.display = 'flex';
       document.getElementById('myRankNum').textContent    = myRank ? '#' + myRank : '--';
       document.getElementById('myRankName').textContent   = user.name;
+      const myCC = myData.coursesCompleted || 0;
       document.getElementById('myRankPoints').textContent =
-        formatPoints(myData.points) + ' points • ' + (myData.coursesCompleted || 0) + ' courses completed';
+        formatPoints(myData.points) + ' points · ' + myCC + ' course' + (myCC === 1 ? '' : 's') + ' completed';
     }
 
     document.getElementById('leaderboardRows').innerHTML = active.map((u, i) => {
@@ -154,7 +155,7 @@
           <div class="lb-rank">${rankDisplay}</div>
           <div class="lb-name">${escHtml(u.name)}${isMe ? '<span class="you-badge">You</span>' : ''}</div>
           <div class="lb-points">${starSvg}${formatPoints(u.points || 0)}</div>
-          <div class="lb-courses">${u.coursesCompleted || 0} courses</div>
+          <div class="lb-courses">${(u.coursesCompleted || 0) === 1 ? '1 course' : (u.coursesCompleted || 0) + ' courses'}</div>
           <div></div>
         </div>
       `;
