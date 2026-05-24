@@ -199,16 +199,28 @@
       </div>`;
     } else {
       activitySection.innerHTML = recentActivity.slice(0, 6).map(a => {
-        const subj   = SUBJECTS.find(s => s.id === a.subjectId);
-        const course = subj ? subj.courses.find(c => c.id === a.courseId) : null;
-        const pct    = Math.round((a.score / (a.totalQuestions || 5)) * 100);
+        let title, meta;
+        if (a.description) {
+          // Backend format
+          title = a.description;
+          const d = new Date(a.created_at);
+          meta = isNaN(d) ? '' : d.toLocaleDateString('en-GB', { day:'numeric', month:'short' });
+        } else {
+          // localStorage format
+          const subj   = SUBJECTS.find(s => s.id === a.subjectId);
+          const course = subj ? subj.courses.find(c => c.id === a.courseId) : null;
+          title = course ? course.title : (a.courseId || 'Quiz completed');
+          const pct = Math.round(((a.score||0) / (a.totalQuestions||5)) * 100);
+          meta = (subj ? subj.title + ' · ' : '') + pct + '% score';
+        }
         return `
           <div style="padding:14px 20px;border-bottom:1px solid var(--slate-200);display:flex;align-items:center;gap:12px;">
+            <div style="width:8px;height:8px;border-radius:50%;background:#10b981;flex-shrink:0;"></div>
             <div style="flex:1;">
-              <div style="font-weight:600;font-size:14px;">${course ? course.title : a.courseId}</div>
-              <div style="font-size:13px;color:var(--text-muted);">${subj ? subj.title : a.subjectId} &bull; ${pct}% score</div>
+              <div style="font-weight:600;font-size:14px;">${title}</div>
+              <div style="font-size:13px;color:var(--text-muted);">${meta}</div>
             </div>
-            <div style="font-size:14px;font-weight:700;color:var(--amber);">+${a.points} pts</div>
+            <div style="font-size:14px;font-weight:700;color:#d97706;">+${a.points} pts</div>
           </div>`;
       }).join('');
     }

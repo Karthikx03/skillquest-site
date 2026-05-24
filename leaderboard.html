@@ -117,7 +117,8 @@
 
     loading.style.display = 'none';
 
-    const active = entries.filter(u => u.points > 0 || u.coursesCompleted > 0);
+    const active = entries.filter(u => (u.points > 0 || u.coursesCompleted > 0) &&
+      !['demo user', 'test', 'test student', 'admin'].includes((u.name||'').toLowerCase().trim()));
 
     if (!active.length) {
       table.style.display = 'none';

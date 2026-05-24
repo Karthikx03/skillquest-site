@@ -51,7 +51,7 @@ function renderNav() {
           <a href="index.html" class="nav-link ${isActive('index.html')}">Home</a>
           <a href="courses.html" class="nav-link ${isActive('courses.html')}">Courses</a>
           <a href="leaderboard.html" class="nav-link ${isActive('leaderboard.html')}">Leaderboard</a>
-          <a href="rewards.html" class="nav-link ${isActive('rewards.html')}" style="display:inline-flex;align-items:center;gap:4px;">🎰 Lottery</a>
+          <a href="rewards.html" class="nav-link ${isActive('rewards.html')}">Lottery</a>
           <a href="about.html" class="nav-link ${isActive('about.html')}">About</a>
           <div class="nav-auth">${authHtml}</div>
         </div>
@@ -112,7 +112,7 @@ function renderFooter() {
             <h4>Platform</h4>
             <a href="courses.html">Browse courses</a>
             <a href="leaderboard.html">Leaderboard</a>
-            <a href="rewards.html">🎰 Monthly Lottery</a>
+            <a href="rewards.html">Monthly Prize Draw</a>
             <a href="about.html">About</a>
             <a href="contact.html">Contact</a>
           </div>

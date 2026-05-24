@@ -7,18 +7,69 @@
   <link rel="icon" href="favicon.svg">
   <link rel="stylesheet" href="css/style.css">
   <style>
-    body { display:flex; align-items:center; justify-content:center; min-height:100vh; text-align:center; background:#0f172a; color:#fff; flex-direction:column; gap:1.5rem; font-family:inherit; padding:2rem; }
-    .code { font-size:6rem; font-weight:800; background:linear-gradient(135deg,#6366f1,#8b5cf6); -webkit-background-clip:text; -webkit-text-fill-color:transparent; line-height:1; }
-    h1 { font-size:1.75rem; font-weight:700; margin:0; }
-    p { color:#94a3b8; max-width:400px; margin:0; }
-    a { display:inline-block; margin-top:0.5rem; padding:0.75rem 2rem; background:#6366f1; color:#fff; border-radius:0.5rem; text-decoration:none; font-weight:600; transition:background 0.2s; }
-    a:hover { background:#4f46e5; }
+    .not-found-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 80px 24px;
+      min-height: 60vh;
+    }
+    .not-found-code {
+      font-size: clamp(80px, 15vw, 140px);
+      font-weight: 800;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1;
+      margin-bottom: 20px;
+    }
+    .not-found-title {
+      font-size: clamp(22px, 4vw, 32px);
+      font-weight: 700;
+      color: var(--text-dark);
+      margin-bottom: 16px;
+    }
+    .not-found-desc {
+      font-size: 16px;
+      color: var(--text-muted);
+      max-width: 420px;
+      line-height: 1.7;
+      margin-bottom: 36px;
+    }
+    .not-found-links {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
   </style>
 </head>
 <body>
-  <div class="code">404</div>
-  <h1>Page Not Found</h1>
-  <p>The page you're looking for doesn't exist or has been moved.</p>
-  <a href="index.html">← Back to SkillQuest</a>
+<div id="navbar"></div>
+<div class="nav-spacer"></div>
+
+<section class="not-found-section">
+  <div class="not-found-code">404</div>
+  <h1 class="not-found-title">Page Not Found</h1>
+  <p class="not-found-desc">The page you are looking for does not exist or has been moved. Here are some helpful links to get you back on track.</p>
+  <div class="not-found-links">
+    <a href="index.html" class="btn btn-primary">Home</a>
+    <a href="courses.html" class="btn btn-secondary">Browse Courses</a>
+    <a href="dashboard.html" class="btn btn-ghost">Dashboard</a>
+  </div>
+</section>
+
+<div id="footer"></div>
+<script src="js/api.js"></script>
+<script src="js/seed.js"></script>
+<script src="js/data.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/utils.js"></script>
+<script>
+  initPage();
+</script>
 </body>
 </html>
