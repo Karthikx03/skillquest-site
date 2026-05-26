@@ -214,17 +214,25 @@
   function filterSubjects(query) {
     const q = query.toLowerCase().trim();
     if (!q) { renderSubjects(SUBJECTS); return; }
-    // Match against title text OR the subject/course id.
-    // Matching the id handles cases like "finance" → subject id "finance"
-    // even though "finance" is not a substring of "Financial Literacy".
+
+    // Match title words by prefix (e.g. "ai" → "AI & Technology")
     function textMatches(text) {
       const t = text.toLowerCase();
       return t.includes(q) || t.split(/\s+/).some(word => word.startsWith(q));
     }
+
+    // Match IDs by hyphen-segment prefix only (NOT substring).
+    // This prevents "fundraising" matching "ai" because r-a-i happens to appear in the word.
+    // Correct: 'ai-tech'.split('-') → ['ai','tech'] → 'ai'.startsWith('ai') ✓
+    // Blocked: 'fundraising'.split('-') → ['fundraising'] → no segment starts with 'ai' ✓
+    function idMatches(id) {
+      return id.toLowerCase().split(/[-_]/).some(seg => seg.startsWith(q));
+    }
+
     const filtered = SUBJECTS.filter(s =>
       textMatches(s.title) ||
-      s.id.toLowerCase().includes(q) ||
-      s.courses.some(c => textMatches(c.title) || c.id.toLowerCase().includes(q))
+      idMatches(s.id) ||
+      s.courses.some(c => textMatches(c.title) || idMatches(c.id))
     );
     renderSubjects(filtered);
   }

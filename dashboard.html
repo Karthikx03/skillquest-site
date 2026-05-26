@@ -96,8 +96,39 @@
 
   const starSvg   = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>';
   const checkSvg  = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>';
-  const bookSvg   = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>';
-  const trophySvg = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 010-5H6"/><path d="M18 9h1.5a2.5 2.5 0 000-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17a2 2 0 002 2h0a2 2 0 002-2v-2.34"/><path d="M6 4h12v6a6 6 0 01-12 0V4z"/></svg>';
+  const quizSvg   = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>';
+  const flameSvg  = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10 0-4.5-3-8.5-6-11 0 3-2 5-4 5-2 0-3-1-3-3-3 3-4 7-4 9 0 5.523 4.477 10 10 10z"/></svg>';
+
+  // Calculate current activity streak (consecutive days with at least one completed quiz)
+  function calcStreak(activities) {
+    if (!activities || !activities.length) return 0;
+    const daySet = new Set();
+    activities.forEach(a => {
+      const raw = a.created_at || a.date || '';
+      const d = new Date(raw);
+      if (!isNaN(d)) {
+        const key = d.getFullYear() + '-' + d.getMonth() + '-' + d.getDate();
+        daySet.add(key);
+      }
+    });
+    if (!daySet.size) return 0;
+    let streak = 0;
+    const now = new Date();
+    for (let i = 0; i <= 365; i++) {
+      const d = new Date(now);
+      d.setDate(d.getDate() - i);
+      const key = d.getFullYear() + '-' + d.getMonth() + '-' + d.getDate();
+      if (daySet.has(key)) {
+        streak++;
+      } else if (i === 0) {
+        // Not active today — check if streak started yesterday
+        continue;
+      } else {
+        break;
+      }
+    }
+    return streak;
+  }
 
   async function loadDashboard() {
     // Fetch all data from backend in parallel; fall back to localStorage if offline
@@ -144,12 +175,16 @@
     }
 
     // Derive counts from progress
-    let completed = 0, started = 0;
+    let completed = 0;
     for (const sid in progress) {
-      const courses = progress[sid];
-      if (Object.keys(courses).length > 0) started++;
-      completed += Object.values(courses).filter(c => c.completed).length;
+      completed += Object.values(progress[sid]).filter(c => c.completed).length;
     }
+
+    // Quizzes taken = completed courses (each course ends with a quiz)
+    const quizzesTaken = completed;
+
+    // Current streak from activity dates
+    const streak = calcStreak(recentActivity);
 
     // ── Stats grid ──────────────────────────────────────────
     document.getElementById('statsGrid').innerHTML = `
@@ -162,12 +197,12 @@
         <div><div class="stat-value">${completed}</div><div class="stat-label">Courses completed</div></div>
       </div>
       <div class="stat-card">
-        <div class="stat-icon" style="background:rgba(37,99,235,0.1);">${bookSvg}</div>
-        <div><div class="stat-value">${started}</div><div class="stat-label">Subjects started</div></div>
+        <div class="stat-icon" style="background:rgba(37,99,235,0.1);">${quizSvg}</div>
+        <div><div class="stat-value">${quizzesTaken}</div><div class="stat-label">Quizzes taken</div></div>
       </div>
       <div class="stat-card">
-        <div class="stat-icon" style="background:rgba(124,58,237,0.1);">${trophySvg}</div>
-        <div><div class="stat-value">${myRank > 0 ? '#' + myRank : '--'}</div><div class="stat-label">Your rank</div></div>
+        <div class="stat-icon" style="background:rgba(239,68,68,0.1);">${flameSvg}</div>
+        <div><div class="stat-value">${streak > 0 ? streak : '--'}</div><div class="stat-label">Day streak</div></div>
       </div>
     `;
 

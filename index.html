@@ -192,8 +192,8 @@
         <span class="hero-stat-label">Subject areas</span>
       </div>
       <div class="hero-stat">
-        <span class="hero-stat-num">$0</span>
-        <span class="hero-stat-label">Cost, ever</span>
+        <span class="hero-stat-num" id="heroPointsCount">—</span>
+        <span class="hero-stat-label">Points awarded</span>
       </div>
     </div>
     <div class="hero-cta">
@@ -554,24 +554,32 @@
 <script>
   initPage();
 
-  // Pull live quiz count from the public stats endpoint
+  // Pull live stats from the public /api/stats endpoint
   (function loadLiveStats() {
-    const el = document.getElementById('heroQuizCount');
-    if (!el) return;
+    const quizEl   = document.getElementById('heroQuizCount');
+    const pointsEl = document.getElementById('heroPointsCount');
     const base = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
       ? 'http://localhost:3000' : '';
     fetch(base + '/api/stats')
       .then(r => r.ok ? r.json() : null)
       .then(data => {
-        if (data && data.totalQuizzes != null) {
-          el.textContent = data.totalQuizzes >= 1000
+        if (!data) return;
+        if (quizEl && data.totalQuizzes != null) {
+          quizEl.textContent = data.totalQuizzes >= 1000
             ? (data.totalQuizzes / 1000).toFixed(1).replace(/\.0$/, '') + 'k'
             : String(data.totalQuizzes);
-        } else {
-          el.textContent = '—';
+        }
+        if (pointsEl && data.totalPoints != null) {
+          const pts = Number(data.totalPoints);
+          pointsEl.textContent = pts >= 1000
+            ? (pts / 1000).toFixed(1).replace(/\.0$/, '') + 'k'
+            : String(pts);
         }
       })
-      .catch(() => { el.textContent = '—'; });
+      .catch(() => {
+        if (quizEl)   quizEl.textContent   = '—';
+        if (pointsEl) pointsEl.textContent = '—';
+      });
   })();
 </script>
 </body>

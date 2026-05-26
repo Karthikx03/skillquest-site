@@ -518,28 +518,52 @@ app.get('/api/admin/draws', adminMiddleware, async (_req, res) => {
 
 // POST /api/admin/draws/pick-winner — randomly select winner for a tier
 app.post('/api/admin/draws/pick-winner', adminMiddleware, async (req, res) => {
+  // Hard 10-second timeout so the request never hangs indefinitely
+  const timer = setTimeout(() => {
+    if (!res.headersSent) res.status(504).json({ error: 'Request timed out. Please try again.' });
+  }, 10000);
+
   try {
     const { tier } = req.body || {};
-    if (!DRAW_COSTS[tier]) return res.status(400).json({ error: 'Invalid tier.' });
+    if (!DRAW_COSTS[tier]) {
+      clearTimeout(timer);
+      return res.status(400).json({ error: 'Invalid tier.' });
+    }
 
     const monthKey = new Date().toISOString().slice(0, 7);
-    const entries  = await q(`
+
+    // Cast both sides to text to avoid any type-mismatch hang on the JOIN
+    const entries = await q(`
       SELECT de.user_id, u.name
-      FROM draw_entries de JOIN users u ON u.id = de.user_id
+      FROM draw_entries de
+      JOIN users u ON u.id::text = de.user_id::text
       WHERE de.draw_tier = $1 AND de.month_key = $2
     `, [tier, monthKey]);
 
-    if (!entries.length) return res.status(400).json({ error: 'No entries in this draw.' });
+    if (!entries.length) {
+      clearTimeout(timer);
+      return res.status(400).json({ error: 'No entries in this draw tier for the current month.' });
+    }
 
     const winner = entries[Math.floor(Math.random() * entries.length)];
+
+    // Use EXCLUDED pseudo-table — avoids $N re-binding issues in ON CONFLICT SET
     await q(`
       INSERT INTO draw_winners (draw_tier, month_key, winner_user_id, winner_name)
       VALUES ($1, $2, $3, $4)
-      ON CONFLICT (draw_tier, month_key) DO UPDATE SET winner_user_id = $3, winner_name = $4, picked_at = NOW()
+      ON CONFLICT (draw_tier, month_key) DO UPDATE
+        SET winner_user_id = EXCLUDED.winner_user_id,
+            winner_name    = EXCLUDED.winner_name,
+            picked_at      = NOW()
     `, [tier, monthKey, winner.user_id, winner.name]);
 
-    res.json({ ok: true, winner: winner.name, tier, totalEntries: entries.length });
-  } catch (err) { res.status(500).json({ error: 'Server error.' }); }
+    clearTimeout(timer);
+    if (!res.headersSent) res.json({ ok: true, winner: winner.name, tier, totalEntries: entries.length });
+  } catch (err) {
+    clearTimeout(timer);
+    console.error('[pick-winner]', err.message);
+    if (!res.headersSent) res.status(500).json({ error: 'Server error: ' + err.message });
+  }
 });
 
 // GET /api/admin/export-csv

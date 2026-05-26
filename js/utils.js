@@ -64,7 +64,8 @@ function renderNav() {
           <a href="index.html" class="nav-link ${isActive('index.html')}">Home</a>
           <a href="courses.html" class="nav-link ${isActive('courses.html')}">Courses</a>
           <a href="leaderboard.html" class="nav-link ${isActive('leaderboard.html')}">Leaderboard</a>
-          <a href="rewards.html" class="nav-link ${isActive('rewards.html')}">Lottery</a>
+          <a href="rewards.html" class="nav-link ${isActive('rewards.html')}">Rewards</a>
+          ${user ? `<a href="dashboard.html" class="nav-link ${isActive('dashboard.html')}">Dashboard</a>` : ''}
           <a href="about.html" class="nav-link ${isActive('about.html')}">About</a>
           <div class="nav-auth">${authHtml}</div>
         </div>
