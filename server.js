@@ -99,6 +99,24 @@ async function initSchema() {
       message    TEXT NOT NULL,
       created_at TIMESTAMPTZ DEFAULT NOW()
     );
+    CREATE TABLE IF NOT EXISTS draw_entries (
+      id          SERIAL PRIMARY KEY,
+      user_id     TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      draw_tier   TEXT NOT NULL,
+      month_key   TEXT NOT NULL,
+      points_spent INTEGER NOT NULL,
+      entered_at  TIMESTAMPTZ DEFAULT NOW(),
+      UNIQUE(user_id, month_key)
+    );
+    CREATE TABLE IF NOT EXISTS draw_winners (
+      id              SERIAL PRIMARY KEY,
+      draw_tier       TEXT NOT NULL,
+      month_key       TEXT NOT NULL,
+      winner_user_id  TEXT,
+      winner_name     TEXT,
+      picked_at       TIMESTAMPTZ DEFAULT NOW(),
+      UNIQUE(draw_tier, month_key)
+    );
   `);
   console.log('  Database schema ready.');
 }
@@ -351,6 +369,57 @@ app.post('/api/contact', async (req, res) => {
 });
 
 /* ══════════════════════════════════════════════════════════
+   DRAW ROUTES
+══════════════════════════════════════════════════════════ */
+
+const DRAW_COSTS = { bronze: 50, gold: 100, diamond: 200 };
+
+// POST /api/draws/enter — spend points to enter a draw
+app.post('/api/draws/enter', authMiddleware, async (req, res) => {
+  try {
+    const { tier } = req.body || {};
+    if (!DRAW_COSTS[tier]) return res.status(400).json({ error: 'Invalid draw tier. Must be bronze, gold, or diamond.' });
+
+    const monthKey = new Date().toISOString().slice(0, 7);
+    const cost     = DRAW_COSTS[tier];
+
+    // One draw per user per month
+    const existing = await q1('SELECT draw_tier FROM draw_entries WHERE user_id = $1 AND month_key = $2', [req.user.id, monthKey]);
+    if (existing) return res.status(409).json({ error: 'Already entered this month.', tier: existing.draw_tier });
+
+    // Check balance
+    const ptRow = await q1('SELECT total FROM user_points WHERE user_id = $1', [req.user.id]);
+    const current = ptRow ? Number(ptRow.total) : 0;
+    if (current < cost) return res.status(400).json({ error: 'Not enough points.', required: cost, available: current });
+
+    // Deduct points
+    const newTotal = current - cost;
+    await q(`UPDATE user_points SET total = $1, updated_at = NOW() WHERE user_id = $2`, [newTotal, req.user.id]);
+    await q('INSERT INTO points_log (user_id, delta, total, note) VALUES ($1, $2, $3, $4)',
+            [req.user.id, -cost, newTotal, `Entered ${tier} draw`]);
+
+    // Record entry
+    await q('INSERT INTO draw_entries (user_id, draw_tier, month_key, points_spent) VALUES ($1, $2, $3, $4)',
+            [req.user.id, tier, monthKey, cost]);
+
+    res.json({ ok: true, tier, pointsRemaining: newTotal });
+  } catch (err) { res.status(500).json({ error: 'Server error.' }); }
+});
+
+// GET /api/draws/my-entry — get current user's entry + tier counts + winners
+app.get('/api/draws/my-entry', authMiddleware, async (req, res) => {
+  try {
+    const monthKey = new Date().toISOString().slice(0, 7);
+    const entry    = await q1('SELECT draw_tier, points_spent, entered_at FROM draw_entries WHERE user_id = $1 AND month_key = $2', [req.user.id, monthKey]);
+    const counts   = await q('SELECT draw_tier, COUNT(*) AS cnt FROM draw_entries WHERE month_key = $1 GROUP BY draw_tier', [monthKey]);
+    const winners  = await q('SELECT draw_tier, winner_name FROM draw_winners WHERE month_key = $1', [monthKey]);
+    const tierCounts  = {}; counts.forEach(r  => { tierCounts[r.draw_tier]  = Number(r.cnt); });
+    const tierWinners = {}; winners.forEach(w => { tierWinners[w.draw_tier] = w.winner_name; });
+    res.json({ entry: entry || null, tierCounts, tierWinners, monthKey });
+  } catch (err) { res.status(500).json({ error: 'Server error.' }); }
+});
+
+/* ══════════════════════════════════════════════════════════
    ADMIN ROUTES
 ══════════════════════════════════════════════════════════ */
 
@@ -427,6 +496,49 @@ app.get('/api/admin/messages', adminMiddleware, async (_req, res) => {
   try {
     const rows = await q('SELECT * FROM contacts ORDER BY created_at DESC LIMIT 200');
     res.json(rows);
+  } catch (err) { res.status(500).json({ error: 'Server error.' }); }
+});
+
+// GET /api/admin/draws — all entries + winners for current month
+app.get('/api/admin/draws', adminMiddleware, async (_req, res) => {
+  try {
+    const monthKey = new Date().toISOString().slice(0, 7);
+    const entries  = await q(`
+      SELECT de.draw_tier, de.points_spent, de.entered_at, u.name, u.email
+      FROM draw_entries de
+      JOIN users u ON u.id = de.user_id
+      WHERE de.month_key = $1
+      ORDER BY de.draw_tier, de.entered_at ASC
+    `, [monthKey]);
+    const winners  = await q('SELECT draw_tier, winner_name, picked_at FROM draw_winners WHERE month_key = $1', [monthKey]);
+    const tierWinners = {}; winners.forEach(w => { tierWinners[w.draw_tier] = { name: w.winner_name, pickedAt: w.picked_at }; });
+    res.json({ entries, tierWinners, monthKey });
+  } catch (err) { res.status(500).json({ error: 'Server error.' }); }
+});
+
+// POST /api/admin/draws/pick-winner — randomly select winner for a tier
+app.post('/api/admin/draws/pick-winner', adminMiddleware, async (req, res) => {
+  try {
+    const { tier } = req.body || {};
+    if (!DRAW_COSTS[tier]) return res.status(400).json({ error: 'Invalid tier.' });
+
+    const monthKey = new Date().toISOString().slice(0, 7);
+    const entries  = await q(`
+      SELECT de.user_id, u.name
+      FROM draw_entries de JOIN users u ON u.id = de.user_id
+      WHERE de.draw_tier = $1 AND de.month_key = $2
+    `, [tier, monthKey]);
+
+    if (!entries.length) return res.status(400).json({ error: 'No entries in this draw.' });
+
+    const winner = entries[Math.floor(Math.random() * entries.length)];
+    await q(`
+      INSERT INTO draw_winners (draw_tier, month_key, winner_user_id, winner_name)
+      VALUES ($1, $2, $3, $4)
+      ON CONFLICT (draw_tier, month_key) DO UPDATE SET winner_user_id = $3, winner_name = $4, picked_at = NOW()
+    `, [tier, monthKey, winner.user_id, winner.name]);
+
+    res.json({ ok: true, winner: winner.name, tier, totalEntries: entries.length });
   } catch (err) { res.status(500).json({ error: 'Server error.' }); }
 });
 
