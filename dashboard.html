@@ -362,7 +362,8 @@
       document.getElementById('youWonPrizeAmt').textContent = prize;
 
       document.getElementById('youWonOverlay').style.display = 'flex';
-      requestAnimationFrame(() => launchYouWonConfetti());
+      // Two rAF frames so the browser paints the overlay before we read canvas dimensions
+      requestAnimationFrame(() => requestAnimationFrame(() => launchYouWonConfetti()));
 
       // Mark this win as seen
       seenList.push(tier + '_' + month);

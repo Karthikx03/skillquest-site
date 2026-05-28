@@ -2219,7 +2219,7 @@ function showWinnerCelebration(winnerName, tier, totalEntries) {
     `${tierLabel} Draw Winner · ${prize} Gift Card · Drawn from ${totalEntries} entr${totalEntries === 1 ? 'y' : 'ies'}`;
 
   overlay.style.display = 'flex';
-  requestAnimationFrame(() => launchConfetti());
+  requestAnimationFrame(() => requestAnimationFrame(() => launchConfetti()));
 }
 
 function closeWinnerCelebration() {

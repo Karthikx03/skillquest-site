@@ -56,13 +56,26 @@
     <!-- YouTube video embed -->
     <div class="video-section" id="videoSection" style="display:none;">
       <h2 id="videoSectionTitle">Recommended Video</h2>
-      <div class="video-wrapper">
+      <!-- Embed wrapper (shown when a videoId exists) -->
+      <div class="video-wrapper" id="videoEmbedWrapper">
         <iframe id="videoFrame" src="" title="Subject introduction video" allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
         <div class="video-fallback" id="videoFallback">
           <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M10 9l5 3-5 3V9z"/></svg>
           <p>This video is currently unavailable.</p>
           <a id="videoFallbackLink" href="#" target="_blank" rel="noopener">Search on YouTube &rarr;</a>
         </div>
+      </div>
+      <!-- Search card (shown immediately when only videoSearch is set, no videoId) -->
+      <div id="videoSearchCard" style="display:none;background:linear-gradient(135deg,#f0f9ff,#e0f2fe);border:1px solid #bae6fd;border-radius:16px;padding:32px 28px;display:none;align-items:center;gap:24px;flex-wrap:wrap;">
+        <div style="flex:1;min-width:220px;">
+          <div style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#0369a1;margin-bottom:6px;">Find a Video</div>
+          <div id="videoSearchTitle" style="font-size:18px;font-weight:800;color:#0c4a6e;margin-bottom:6px;"></div>
+          <p style="font-size:13.5px;color:#075985;margin:0;">Watch free tutorials on YouTube to complement the courses below.</p>
+        </div>
+        <a id="videoSearchLink" href="#" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;background:#0ea5e9;color:white;border:none;border-radius:12px;padding:14px 24px;font-size:14px;font-weight:800;text-decoration:none;white-space:nowrap;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+          Search on YouTube
+        </a>
       </div>
     </div>
 
@@ -97,11 +110,23 @@
     document.getElementById('subjectCourseCount').textContent = subject.courses.length + ' Courses';
     document.getElementById('subjectPoints').textContent = totalPoints + ' Points Available';
 
-    // YouTube video embed with bullet-proof fallback.
-    // Two detection methods run in parallel — whichever fires first wins:
-    //   1. Timeout: if YouTube doesn't confirm the player is ready within 7s, show fallback.
-    //   2. postMessage: YouTube iframe API sends onError (100/101/150) for unavailable videos.
-    // Both are needed because broken/region-blocked videos never send postMessages at all.
+    // ── Option A: no embed but a search term is provided — show search card immediately ──
+    if (!subject.videoId && subject.videoSearch) {
+      const sec = document.getElementById('videoSection');
+      const card = document.getElementById('videoSearchCard');
+      const link = document.getElementById('videoSearchLink');
+      const titleEl = document.getElementById('videoSearchTitle');
+      document.getElementById('videoEmbedWrapper').style.display = 'none';
+      card.style.display = 'flex';
+      sec.style.display = 'block';
+      if (subject.videoTitle) {
+        titleEl.textContent = subject.videoTitle;
+        document.getElementById('videoSectionTitle').textContent = subject.videoTitle;
+      }
+      link.href = 'https://www.youtube.com/results?search_query=' + encodeURIComponent(subject.videoSearch);
+    }
+
+    // ── Option B: a videoId is set — embed with bullet-proof fallback ──
     if (subject.videoId) {
       const videoSection      = document.getElementById('videoSection');
       const videoFrame        = document.getElementById('videoFrame');

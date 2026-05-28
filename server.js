@@ -422,10 +422,13 @@ app.get('/api/draws/my-entry', authMiddleware, async (req, res) => {
 // GET /api/draws/my-wins — returns all draws the current user has won (any month)
 app.get('/api/draws/my-wins', authMiddleware, async (req, res) => {
   try {
+    // Match by user_id (new records) OR by name (old records where winner_user_id was NULL)
     const wins = await q(
       `SELECT draw_tier, month_key, picked_at
        FROM draw_winners
        WHERE winner_user_id::text = $1::text
+          OR (winner_user_id IS NULL
+              AND winner_name = (SELECT name FROM users WHERE id::text = $1::text LIMIT 1))
        ORDER BY picked_at DESC`,
       [String(req.user.id)]
     );
