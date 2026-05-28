@@ -406,7 +406,7 @@ app.post('/api/draws/enter', authMiddleware, async (req, res) => {
   } catch (err) { res.status(500).json({ error: 'Server error.' }); }
 });
 
-// GET /api/draws/my-entry — get current user's entry + tier counts + winners
+// GET /api/draws/my-entry — get current user's entry + tier counts + winners + any wins
 app.get('/api/draws/my-entry', authMiddleware, async (req, res) => {
   try {
     const monthKey = new Date().toISOString().slice(0, 7);
@@ -415,8 +415,23 @@ app.get('/api/draws/my-entry', authMiddleware, async (req, res) => {
     const winners  = await q('SELECT draw_tier, winner_name FROM draw_winners WHERE month_key = $1', [monthKey]);
     const tierCounts  = {}; counts.forEach(r  => { tierCounts[r.draw_tier]  = Number(r.cnt); });
     const tierWinners = {}; winners.forEach(w => { tierWinners[w.draw_tier] = w.winner_name; });
-    res.json({ entry: entry || null, tierCounts, tierWinners, monthKey });
-  } catch (err) { res.status(500).json({ error: 'Server error.' }); }
+
+    // Check all months for wins by this user — match on BOTH user_id string AND name
+    // (name fallback handles records written before user_id was stored correctly)
+    const myWinRows = await q(
+      `SELECT draw_tier, month_key, picked_at
+       FROM draw_winners
+       WHERE winner_user_id = $1
+          OR winner_name    = $2
+       ORDER BY picked_at DESC`,
+      [String(req.user.id), String(req.user.name)]
+    );
+
+    res.json({ entry: entry || null, tierCounts, tierWinners, monthKey, myWins: myWinRows || [] });
+  } catch (err) {
+    console.error('[my-entry]', err.message);
+    res.status(500).json({ error: 'Server error.' });
+  }
 });
 
 // GET /api/draws/my-wins — returns all draws the current user has won (any month)

@@ -337,10 +337,14 @@
 
   async function checkForWins() {
     try {
-      const r = await fetch(API_BASE + '/api/draws/my-wins', { headers: hdrs });
+      // Use /api/draws/my-entry — it's the proven-working draw endpoint (used by rewards.html).
+      // The server now returns myWins[] matched by BOTH user_id string AND winner_name,
+      // so old NULL-user_id records and new records are both caught.
+      const r = await fetch(API_BASE + '/api/draws/my-entry', { headers: hdrs });
       if (!r.ok) return;
-      const { wins } = await r.json();
-      if (!wins || !wins.length) return;
+      const data = await r.json();
+      const wins = data.myWins || [];
+      if (!wins.length) return;
 
       // Only show popup for wins not yet acknowledged (stored in localStorage)
       const seenKey  = 'sq_seen_wins_' + user.id;
@@ -354,21 +358,23 @@
       const month = win.month_key;
       const label = tier.charAt(0).toUpperCase() + tier.slice(1);
       const [yr, mo] = month.split('-');
-      const monthName = new Date(yr, mo - 1).toLocaleString('en-US', { month: 'long', year: 'numeric' });
-      const prize = WIN_PRIZES[tier] || '???';
+      const monthName = new Date(Number(yr), Number(mo) - 1).toLocaleString('en-US', { month: 'long', year: 'numeric' });
+      const prize = WIN_PRIZES[tier] || 'a prize';
 
       document.getElementById('youWonDesc').textContent =
         `You were selected as the ${label} Draw winner for ${monthName}! 🎊`;
       document.getElementById('youWonPrizeAmt').textContent = prize;
 
       document.getElementById('youWonOverlay').style.display = 'flex';
-      // Two rAF frames so the browser paints the overlay before we read canvas dimensions
+      // Two rAF so the browser paints the overlay BEFORE we measure canvas dimensions
       requestAnimationFrame(() => requestAnimationFrame(() => launchYouWonConfetti()));
 
-      // Mark this win as seen
+      // Mark as seen so it won't show again on next page load
       seenList.push(tier + '_' + month);
       localStorage.setItem(seenKey, JSON.stringify(seenList));
-    } catch (_) {}
+    } catch (e) {
+      console.warn('[checkForWins]', e.message);
+    }
   }
 
   function closeYouWon() {
