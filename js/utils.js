@@ -20,8 +20,6 @@ function renderNav() {
           <svg class="nav-user-arrow" width="10" height="7" viewBox="0 0 10 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 1l4 4 4-4"/></svg>
         </button>
         <div class="nav-user-dropdown" id="navUserDropdown" role="menu">
-          <a href="dashboard.html" class="nav-dropdown-item" role="menuitem">My Profile</a>
-          <a href="dashboard.html" class="nav-dropdown-item" role="menuitem">Dashboard</a>
           <button onclick="logout()" class="nav-dropdown-item nav-dropdown-logout" role="menuitem">Log out</button>
         </div>
       </div>`;
@@ -37,22 +35,14 @@ function renderNav() {
         <a href="index.html" class="nav-logo" aria-label="SkillQuest home">
           <div class="logo-icon" aria-hidden="true">
             <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <!-- 3D depth shadow layer -->
-              <path d="M11 2.8L4.6 6.4v4.8c0 3.8 2.6 7.3 6.4 8.3 3.8-1 6.4-4.5 6.4-8.3V6.4L11 2.8z" fill="white" fill-opacity="0.07" transform="translate(0.3,0.5)"/>
-              <!-- Main shield body -->
-              <g class="sq-shield-group">
-                <path d="M11 2L4 6v5c0 4.1 2.9 7.9 7 9 4.1-1.1 7-4.9 7-9V6L11 2z" fill="white" fill-opacity="0.22"/>
-                <!-- Top-face highlight for 3D look -->
-                <path d="M11 2L4 6l7 2.2 7-2.2L11 2z" fill="white" fill-opacity="0.28"/>
-                <!-- Left-face subtle shade -->
-                <path d="M4 6v5c0 2.8 1.2 5.4 3.3 7.2L4 6z" fill="white" fill-opacity="0.05"/>
-                <!-- Shield border -->
-                <path d="M11 2L4 6v5c0 4.1 2.9 7.9 7 9 4.1-1.1 7-4.9 7-9V6L11 2z" stroke="white" stroke-width="1.4" stroke-linejoin="round"/>
-                <!-- Inner edge highlight -->
-                <path d="M11 3L4.7 6.5v4.6c0 3.6 2.5 7 6.3 8.1 3.8-1.1 6.3-4.5 6.3-8.1V6.5L11 3z" stroke="white" stroke-width="0.35" stroke-opacity="0.35" stroke-linejoin="round"/>
-              </g>
-              <!-- Glowing checkmark -->
-              <path class="sq-check" d="M8.5 11l1.8 1.8L14 8.5" stroke="white" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+              <!-- Graduation cap board -->
+              <path d="M11 3L21 8L11 13L1 8Z" fill="white"/>
+              <!-- Cap body -->
+              <path d="M5 9.8V15.5C5 15.5 7.5 18.5 11 18.5C14.5 18.5 17 15.5 17 15.5V9.8L11 13L5 9.8Z" fill="white" opacity="0.82"/>
+              <!-- Tassel string -->
+              <path d="M21 8V13" stroke="white" stroke-width="1.4" stroke-linecap="round" opacity="0.9"/>
+              <!-- Tassel end -->
+              <circle cx="21" cy="13.8" r="1.1" fill="white" opacity="0.9"/>
             </svg>
           </div>
           <div class="logo-text">
@@ -111,15 +101,10 @@ function renderFooter() {
             <a href="index.html" class="footer-logo" style="display:flex;align-items:center;gap:10px;margin-bottom:16px;text-decoration:none;" aria-label="SkillQuest home">
               <div class="logo-icon" aria-hidden="true">
                 <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M11 2.8L4.6 6.4v4.8c0 3.8 2.6 7.3 6.4 8.3 3.8-1 6.4-4.5 6.4-8.3V6.4L11 2.8z" fill="white" fill-opacity="0.07" transform="translate(0.3,0.5)"/>
-                  <g class="sq-shield-group">
-                    <path d="M11 2L4 6v5c0 4.1 2.9 7.9 7 9 4.1-1.1 7-4.9 7-9V6L11 2z" fill="white" fill-opacity="0.22"/>
-                    <path d="M11 2L4 6l7 2.2 7-2.2L11 2z" fill="white" fill-opacity="0.28"/>
-                    <path d="M4 6v5c0 2.8 1.2 5.4 3.3 7.2L4 6z" fill="white" fill-opacity="0.05"/>
-                    <path d="M11 2L4 6v5c0 4.1 2.9 7.9 7 9 4.1-1.1 7-4.9 7-9V6L11 2z" stroke="white" stroke-width="1.4" stroke-linejoin="round"/>
-                    <path d="M11 3L4.7 6.5v4.6c0 3.6 2.5 7 6.3 8.1 3.8-1.1 6.3-4.5 6.3-8.1V6.5L11 3z" stroke="white" stroke-width="0.35" stroke-opacity="0.35" stroke-linejoin="round"/>
-                  </g>
-                  <path class="sq-check" d="M8.5 11l1.8 1.8L14 8.5" stroke="white" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M11 3L21 8L11 13L1 8Z" fill="white"/>
+                  <path d="M5 9.8V15.5C5 15.5 7.5 18.5 11 18.5C14.5 18.5 17 15.5 17 15.5V9.8L11 13L5 9.8Z" fill="white" opacity="0.82"/>
+                  <path d="M21 8V13" stroke="white" stroke-width="1.4" stroke-linecap="round" opacity="0.9"/>
+                  <circle cx="21" cy="13.8" r="1.1" fill="white" opacity="0.9"/>
                 </svg>
               </div>
               <span class="logo-title" style="color:white;font-size:18px;font-weight:800;">SkillQuest</span>

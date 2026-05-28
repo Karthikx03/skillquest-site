@@ -15,6 +15,10 @@
     .video-section h2 { font-size: 22px; font-weight: 800; margin-bottom: 16px; }
     .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.12); }
     .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; border-radius: 16px; }
+    .video-fallback { display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:#f1f5f9; border-radius:16px; align-items:center; justify-content:center; flex-direction:column; gap:12px; text-align:center; padding:24px; }
+    .video-fallback svg { color: #94a3b8; }
+    .video-fallback p { color:#64748b; font-size:14px; margin:0; }
+    .video-fallback a { color: var(--primary); font-weight:600; font-size:14px; text-decoration:none; }
 
     /* Course card cover image */
     .course-cover-img { width: 100%; height: 180px; object-fit: cover; display: block; }
@@ -54,6 +58,11 @@
       <h2 id="videoSectionTitle">Recommended Video</h2>
       <div class="video-wrapper">
         <iframe id="videoFrame" src="" title="Subject introduction video" allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
+        <div class="video-fallback" id="videoFallback">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M10 9l5 3-5 3V9z"/></svg>
+          <p>This video is currently unavailable.</p>
+          <a id="videoFallbackLink" href="#" target="_blank" rel="noopener">Search on YouTube &rarr;</a>
+        </div>
       </div>
     </div>
 
@@ -92,13 +101,27 @@
     if (subject.videoId) {
       const videoSection = document.getElementById('videoSection');
       const videoFrame = document.getElementById('videoFrame');
+      const videoFallback = document.getElementById('videoFallback');
+      const videoFallbackLink = document.getElementById('videoFallbackLink');
       const videoTitle = document.getElementById('videoSectionTitle');
       videoSection.style.display = 'block';
       videoFrame.src = 'https://www.youtube.com/embed/' + subject.videoId + '?rel=0&modestbranding=1';
+      const searchQuery = encodeURIComponent((subject.videoTitle || subject.title) + ' tutorial');
+      videoFallbackLink.href = 'https://www.youtube.com/results?search_query=' + searchQuery;
       if (subject.videoTitle) {
         videoTitle.textContent = subject.videoTitle;
         videoFrame.title = subject.videoTitle;
       }
+      // Show fallback if the video fails to load or is unavailable
+      videoFrame.addEventListener('load', function() {
+        // YouTube signals an unavailable video via oembed — check after a short delay
+        fetch('https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=' + subject.videoId + '&format=json')
+          .then(r => { if (!r.ok) throw new Error('unavailable'); })
+          .catch(() => {
+            videoFrame.style.display = 'none';
+            videoFallback.style.display = 'flex';
+          });
+      });
     }
 
     const grid = document.getElementById('coursesGrid');
