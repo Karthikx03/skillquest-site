@@ -2234,9 +2234,10 @@ let _confettiParticles = [];
 function launchConfetti() {
   const canvas = document.getElementById('confettiCanvas');
   if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  canvas.width  = canvas.offsetWidth;
-  canvas.height = canvas.offsetHeight;
+  const ctx  = canvas.getContext('2d');
+  const rect = canvas.getBoundingClientRect();
+  canvas.width  = Math.round(rect.width)  || canvas.parentElement?.offsetWidth  || 560;
+  canvas.height = Math.round(rect.height) || canvas.parentElement?.offsetHeight || 480;
 
   _confettiParticles = Array.from({ length: 90 }, () => ({
     x: Math.random() * canvas.width,

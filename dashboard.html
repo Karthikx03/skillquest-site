@@ -388,9 +388,10 @@
   function launchYouWonConfetti() {
     const canvas = document.getElementById('youWonConfetti');
     if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    canvas.width  = canvas.offsetWidth;
-    canvas.height = canvas.offsetHeight;
+    const ctx  = canvas.getContext('2d');
+    const rect = canvas.getBoundingClientRect();
+    canvas.width  = Math.round(rect.width)  || canvas.parentElement?.offsetWidth  || 420;
+    canvas.height = Math.round(rect.height) || canvas.parentElement?.offsetHeight || 520;
     _ywParticles  = Array.from({ length: 120 }, () => ({
       x: Math.random() * canvas.width,
       y: Math.random() * canvas.height - canvas.height,
