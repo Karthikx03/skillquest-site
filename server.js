@@ -419,6 +419,20 @@ app.get('/api/draws/my-entry', authMiddleware, async (req, res) => {
   } catch (err) { res.status(500).json({ error: 'Server error.' }); }
 });
 
+// GET /api/draws/my-wins — returns all draws the current user has won (any month)
+app.get('/api/draws/my-wins', authMiddleware, async (req, res) => {
+  try {
+    const wins = await q(
+      `SELECT draw_tier, month_key, picked_at
+       FROM draw_winners
+       WHERE winner_user_id = $1
+       ORDER BY picked_at DESC`,
+      [req.user.id]
+    );
+    res.json({ wins });
+  } catch (err) { res.status(500).json({ error: 'Server error.' }); }
+});
+
 /* ══════════════════════════════════════════════════════════
    ADMIN ROUTES
 ══════════════════════════════════════════════════════════ */

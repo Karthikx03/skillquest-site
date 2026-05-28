@@ -97,30 +97,35 @@
     document.getElementById('subjectCourseCount').textContent = subject.courses.length + ' Courses';
     document.getElementById('subjectPoints').textContent = totalPoints + ' Points Available';
 
-    // YouTube video embed
+    // YouTube video embed with graceful fallback for unavailable videos.
+    // Uses YouTube's iframe JS API (enablejsapi=1) which posts an onError message
+    // with info=100/101/150 when a video is unavailable or restricted.
     if (subject.videoId) {
       const videoSection = document.getElementById('videoSection');
-      const videoFrame = document.getElementById('videoFrame');
+      const videoFrame   = document.getElementById('videoFrame');
       const videoFallback = document.getElementById('videoFallback');
       const videoFallbackLink = document.getElementById('videoFallbackLink');
-      const videoTitle = document.getElementById('videoSectionTitle');
+      const videoTitle   = document.getElementById('videoSectionTitle');
       videoSection.style.display = 'block';
-      videoFrame.src = 'https://www.youtube.com/embed/' + subject.videoId + '?rel=0&modestbranding=1';
-      const searchQuery = encodeURIComponent((subject.videoTitle || subject.title) + ' tutorial');
+      videoFrame.src = 'https://www.youtube.com/embed/' + subject.videoId +
+                       '?rel=0&modestbranding=1&enablejsapi=1';
+      const searchQuery = encodeURIComponent((subject.videoTitle || subject.title) + ' for beginners');
       videoFallbackLink.href = 'https://www.youtube.com/results?search_query=' + searchQuery;
       if (subject.videoTitle) {
         videoTitle.textContent = subject.videoTitle;
         videoFrame.title = subject.videoTitle;
       }
-      // Show fallback if the video fails to load or is unavailable
-      videoFrame.addEventListener('load', function() {
-        // YouTube signals an unavailable video via oembed — check after a short delay
-        fetch('https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=' + subject.videoId + '&format=json')
-          .then(r => { if (!r.ok) throw new Error('unavailable'); })
-          .catch(() => {
+      // YouTube iframe API sends postMessage events; error codes 100/101/150 = video unavailable
+      window.addEventListener('message', function onYTMsg(evt) {
+        if (evt.origin !== 'https://www.youtube.com') return;
+        try {
+          const msg = JSON.parse(evt.data);
+          if (msg.event === 'onError' && [100, 101, 150].includes(Number(msg.info))) {
             videoFrame.style.display = 'none';
             videoFallback.style.display = 'flex';
-          });
+            window.removeEventListener('message', onYTMsg);
+          }
+        } catch (_) {}
       });
     }
 

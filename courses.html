@@ -215,10 +215,10 @@
     const q = query.toLowerCase().trim();
     if (!q) { renderSubjects(SUBJECTS); return; }
 
-    // Match title words by prefix (e.g. "ai" → "AI & Technology")
+    // Match text by word-prefix only (e.g. "ai" matches "AI & Technology" but NOT "fundraising").
+    // We deliberately do NOT use t.includes(q) because "entrepreneurial".includes("ai") = true.
     function textMatches(text) {
-      const t = text.toLowerCase();
-      return t.includes(q) || t.split(/\s+/).some(word => word.startsWith(q));
+      return text.toLowerCase().split(/\s+/).some(word => word.startsWith(q));
     }
 
     // Match IDs by hyphen-segment prefix only (NOT substring).

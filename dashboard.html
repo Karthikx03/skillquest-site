@@ -8,6 +8,34 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+
+<!-- ══════════════════════════════════
+     YOU WON! POPUP
+═══════════════════════════════════ -->
+<div id="youWonOverlay" style="display:none;position:fixed;inset:0;z-index:9999;align-items:center;justify-content:center;background:rgba(0,0,0,0.7);backdrop-filter:blur(6px);">
+  <div style="background:white;border-radius:28px;padding:52px 40px;text-align:center;max-width:440px;width:92%;position:relative;animation:winPop 0.5s cubic-bezier(0.34,1.56,0.64,1) both;box-shadow:0 40px 100px rgba(0,0,0,0.4);">
+    <canvas id="youWonConfetti" style="position:absolute;inset:0;width:100%;height:100%;border-radius:28px;pointer-events:none;"></canvas>
+    <div style="font-size:72px;margin-bottom:12px;animation:winBounce 0.7s 0.5s ease infinite alternate;display:block;">🎉</div>
+    <div style="font-size:11px;font-weight:900;letter-spacing:0.2em;text-transform:uppercase;background:linear-gradient(90deg,#d97706,#7c3aed);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:10px;">Congratulations!</div>
+    <h2 style="font-size:28px;font-weight:900;color:#1e293b;margin-bottom:6px;letter-spacing:-0.5px;">You Won the Draw!</h2>
+    <p id="youWonDesc" style="color:#64748b;font-size:15px;line-height:1.6;margin-bottom:28px;"></p>
+    <div id="youWonPrize" style="background:linear-gradient(135deg,#fef3c7,#fde68a);border:2px solid #f59e0b;border-radius:16px;padding:16px 24px;margin-bottom:28px;display:inline-block;">
+      <div style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#92400e;margin-bottom:4px;">Your Prize</div>
+      <div id="youWonPrizeAmt" style="font-size:36px;font-weight:900;color:#78350f;letter-spacing:-1px;"></div>
+      <div style="font-size:12px;color:#92400e;margin-top:2px;">Gift Card · Contact us to claim</div>
+    </div>
+    <br>
+    <button onclick="closeYouWon()" style="background:linear-gradient(135deg,#2563eb,#7c3aed);color:white;border:none;border-radius:14px;padding:16px 40px;font-size:16px;font-weight:800;cursor:pointer;position:relative;z-index:1;letter-spacing:0.02em;box-shadow:0 4px 20px rgba(124,58,237,0.4);">
+      Claim My Prize! 🏆
+    </button>
+    <p style="font-size:12px;color:#94a3b8;margin-top:16px;position:relative;z-index:1;">Email <strong>admin@skillquest.tw</strong> with your registered email to claim.</p>
+  </div>
+</div>
+<style>
+@keyframes winPop    { from { opacity:0; transform:scale(0.5) translateY(60px); } to { opacity:1; transform:scale(1) translateY(0); } }
+@keyframes winBounce { from { transform:translateY(0) rotate(-8deg) scale(1); }  to { transform:translateY(-16px) rotate(8deg) scale(1.1); } }
+</style>
+
 <div id="navbar"></div>
 <div class="nav-spacer"></div>
 
@@ -303,6 +331,88 @@
   }
 
   loadDashboard();
+
+  /* ── Winner notification ─────────────────────────────── */
+  const WIN_PRIZES = { bronze: 'NT$200', gold: 'NT$500', diamond: 'NT$2,000' };
+
+  async function checkForWins() {
+    try {
+      const r = await fetch(API_BASE + '/api/draws/my-wins', { headers: hdrs });
+      if (!r.ok) return;
+      const { wins } = await r.json();
+      if (!wins || !wins.length) return;
+
+      // Only show popup for wins not yet acknowledged (stored in localStorage)
+      const seenKey  = 'sq_seen_wins_' + user.id;
+      const seenList = JSON.parse(localStorage.getItem(seenKey) || '[]');
+      const newWins  = wins.filter(w => !seenList.includes(w.draw_tier + '_' + w.month_key));
+      if (!newWins.length) return;
+
+      // Show the most recent unseen win
+      const win   = newWins[0];
+      const tier  = win.draw_tier;
+      const month = win.month_key;
+      const label = tier.charAt(0).toUpperCase() + tier.slice(1);
+      const [yr, mo] = month.split('-');
+      const monthName = new Date(yr, mo - 1).toLocaleString('en-US', { month: 'long', year: 'numeric' });
+      const prize = WIN_PRIZES[tier] || '???';
+
+      document.getElementById('youWonDesc').textContent =
+        `You were selected as the ${label} Draw winner for ${monthName}! 🎊`;
+      document.getElementById('youWonPrizeAmt').textContent = prize;
+
+      document.getElementById('youWonOverlay').style.display = 'flex';
+      requestAnimationFrame(() => launchYouWonConfetti());
+
+      // Mark this win as seen
+      seenList.push(tier + '_' + month);
+      localStorage.setItem(seenKey, JSON.stringify(seenList));
+    } catch (_) {}
+  }
+
+  function closeYouWon() {
+    document.getElementById('youWonOverlay').style.display = 'none';
+    if (_ywAnim) cancelAnimationFrame(_ywAnim);
+  }
+
+  const YW_COLORS = ['#f59e0b','#7c3aed','#2563eb','#10b981','#ec4899','#ef4444','#fbbf24','#6366f1'];
+  let _ywAnim = null, _ywParticles = [];
+
+  function launchYouWonConfetti() {
+    const canvas = document.getElementById('youWonConfetti');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    canvas.width  = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
+    _ywParticles  = Array.from({ length: 120 }, () => ({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height - canvas.height,
+      w: Math.random() * 11 + 5, h: Math.random() * 6 + 3,
+      color: YW_COLORS[Math.floor(Math.random() * YW_COLORS.length)],
+      vy: Math.random() * 3 + 1.5, vx: (Math.random() - 0.5) * 1.8,
+      angle: Math.random() * Math.PI * 2, spin: (Math.random() - 0.5) * 0.12,
+      opacity: 1
+    }));
+    function frame() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      _ywParticles.forEach(p => {
+        p.y += p.vy; p.x += p.vx; p.angle += p.spin;
+        if (p.y > canvas.height * 0.65) p.opacity = Math.max(0, p.opacity - 0.018);
+        ctx.save(); ctx.globalAlpha = p.opacity;
+        ctx.translate(p.x, p.y); ctx.rotate(p.angle);
+        ctx.fillStyle = p.color;
+        ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+        ctx.restore();
+      });
+      _ywParticles = _ywParticles.filter(p => p.opacity > 0);
+      if (_ywParticles.length > 0) _ywAnim = requestAnimationFrame(frame);
+    }
+    if (_ywAnim) cancelAnimationFrame(_ywAnim);
+    _ywAnim = requestAnimationFrame(frame);
+  }
+
+  // Delay the win check slightly so the dashboard loads first
+  setTimeout(checkForWins, 1200);
 </script>
 </body>
 </html>

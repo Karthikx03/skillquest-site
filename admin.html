@@ -1022,6 +1022,10 @@
         Contact Messages
       </button>
 
+      <button class="nav-item" onclick="showPage('courses', this)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        Courses
+      </button>
       <button class="nav-item" onclick="showPage('draws', this)">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
         Draw Management
@@ -1291,6 +1295,23 @@
       </div><!-- /messages -->
 
       <!-- ═══════════════════════════
+           PAGE: COURSES
+      ═══════════════════════════ -->
+      <div class="admin-page" id="page-courses">
+        <div class="section-header-row" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:12px;">
+          <div>
+            <h2 style="font-size:22px;font-weight:800;margin-bottom:4px;">Course Catalogue</h2>
+            <p style="color:var(--text-muted);font-size:14px;" id="courseCatalogueSubtitle">6 subjects · 36 courses</p>
+          </div>
+          <div class="search-bar" style="max-width:280px;width:100%;">
+            <span class="search-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></span>
+            <input type="text" class="form-input" id="courseSearch" placeholder="Search courses…" oninput="filterAdminCourses(this.value)" style="padding-left:38px;height:38px;font-size:13px;">
+          </div>
+        </div>
+        <div id="coursesCatalogueGrid"></div>
+      </div>
+
+      <!-- ═══════════════════════════
            PAGE: DRAW MANAGEMENT
       ═══════════════════════════ -->
       <div class="admin-page" id="page-draws">
@@ -1343,7 +1364,31 @@
   </main>
 </div><!-- /adminShell -->
 
+<!-- ══════════════════════════════════
+     WINNER CELEBRATION OVERLAY
+═══════════════════════════════════ -->
+<div id="winnerCelebration" style="display:none;position:fixed;inset:0;z-index:9999;align-items:center;justify-content:center;background:rgba(0,0,0,0.65);backdrop-filter:blur(4px);">
+  <div id="winnerCard" style="background:white;border-radius:24px;padding:48px 40px;text-align:center;max-width:420px;width:90%;position:relative;animation:winPop 0.45s cubic-bezier(0.34,1.56,0.64,1) both;box-shadow:0 32px 80px rgba(0,0,0,0.35);">
+    <div id="winnerEmoji" style="font-size:64px;margin-bottom:12px;animation:bounce 0.6s 0.4s ease infinite alternate;">🏆</div>
+    <div style="font-size:13px;font-weight:800;letter-spacing:0.15em;text-transform:uppercase;color:#94a3b8;margin-bottom:8px;">Winner Selected!</div>
+    <div id="winnerNameDisplay" style="font-size:32px;font-weight:900;color:#1e293b;letter-spacing:-0.5px;margin-bottom:6px;"></div>
+    <div id="winnerTierDisplay" style="font-size:15px;color:#64748b;margin-bottom:28px;"></div>
+    <canvas id="confettiCanvas" style="position:absolute;inset:0;width:100%;height:100%;border-radius:24px;pointer-events:none;"></canvas>
+    <button onclick="closeWinnerCelebration()" style="background:linear-gradient(135deg,#2563eb,#7c3aed);color:white;border:none;border-radius:12px;padding:14px 36px;font-size:15px;font-weight:800;cursor:pointer;position:relative;z-index:1;letter-spacing:0.02em;">
+      Awesome! 🎉
+    </button>
+  </div>
+</div>
+<style>
+@keyframes winPop { from { opacity:0; transform:scale(0.6) translateY(40px); } to { opacity:1; transform:scale(1) translateY(0); } }
+@keyframes bounce { from { transform:translateY(0) rotate(-5deg); } to { transform:translateY(-12px) rotate(5deg); } }
+</style>
+
 <div id="toast"></div>
+
+<!-- Load course data so the Courses catalogue panel can read SUBJECTS -->
+<script src="js/seed.js"></script>
+<script src="js/data.js"></script>
 
 <script>
 /* ════════════════════════════════════
@@ -1497,6 +1542,7 @@ const PAGE_TITLES = {
   users:       'Registered Users',
   leaderboard: 'Leaderboard',
   messages:    'Contact Messages',
+  courses:     'Course Catalogue',
   draws:       'Draw Management'
 };
 
@@ -1506,7 +1552,8 @@ function showPage(id, btn) {
   document.getElementById('page-' + id).classList.add('active');
   if (btn) btn.classList.add('active');
   document.getElementById('topbarTitle').textContent = PAGE_TITLES[id] || id;
-  if (id === 'draws') loadDraws();
+  if (id === 'draws')   loadDraws();
+  if (id === 'courses') renderAdminCourses();
 }
 
 /* ════════════════════════════════════
@@ -1883,11 +1930,101 @@ function showToast(msg) {
 }
 
 /* ════════════════════════════════════
+   COURSE CATALOGUE
+════════════════════════════════════ */
+let _allCoursesFlat = null;
+
+function renderAdminCourses(filterQ) {
+  if (!window.SUBJECTS) return;
+  if (!_allCoursesFlat) {
+    _allCoursesFlat = [];
+    SUBJECTS.forEach(s => s.courses.forEach(c => _allCoursesFlat.push({ ...c, subjectId: s.id, subjectTitle: s.title, subjectColor: s.color })));
+  }
+  const q = (filterQ || '').toLowerCase().trim();
+  const filtered = q
+    ? _allCoursesFlat.filter(c =>
+        c.title.toLowerCase().includes(q) ||
+        c.subjectTitle.toLowerCase().includes(q) ||
+        (c.description && c.description.toLowerCase().includes(q))
+      )
+    : _allCoursesFlat;
+
+  // Group by subject preserving subject order
+  const bySubject = {};
+  SUBJECTS.forEach(s => { bySubject[s.id] = { subject: s, courses: [] }; });
+  filtered.forEach(c => { if (bySubject[c.subjectId]) bySubject[c.subjectId].courses.push(c); });
+
+  const totalCourses = filtered.length;
+  const totalSubjects = Object.values(bySubject).filter(g => g.courses.length > 0).length;
+  document.getElementById('courseCatalogueSubtitle').textContent =
+    `${totalSubjects} subject${totalSubjects !== 1 ? 's' : ''} · ${totalCourses} course${totalCourses !== 1 ? 's' : ''}`;
+
+  const SUBJ_COLORS = {
+    blue:    { bg: '#eff6ff', border: '#2563eb', text: '#1d4ed8' },
+    green:   { bg: '#f0fdf4', border: '#16a34a', text: '#15803d' },
+    red:     { bg: '#fef2f2', border: '#dc2626', text: '#b91c1c' },
+    cyan:    { bg: '#ecfeff', border: '#0891b2', text: '#0e7490' },
+    purple:  { bg: '#f5f3ff', border: '#7c3aed', text: '#6d28d9' },
+    orange:  { bg: '#fff7ed', border: '#ea580c', text: '#c2410c' },
+  };
+
+  const grid = document.getElementById('coursesCatalogueGrid');
+  if (!filtered.length) {
+    grid.innerHTML = `<div style="text-align:center;padding:60px;color:var(--text-muted);">No courses match your search.</div>`;
+    return;
+  }
+
+  grid.innerHTML = Object.values(bySubject)
+    .filter(g => g.courses.length > 0)
+    .map(({ subject, courses }) => {
+      const clr = SUBJ_COLORS[subject.color] || SUBJ_COLORS.blue;
+      const rows = courses.map((c, i) => `
+        <tr>
+          <td style="padding:10px 14px;font-size:13px;color:var(--text-muted);width:36px;">${i + 1}</td>
+          <td style="padding:10px 14px;">
+            <div style="font-weight:600;font-size:13.5px;color:var(--text-primary);">${esc(c.title)}</div>
+            ${c.description ? `<div style="font-size:12px;color:var(--text-muted);margin-top:2px;">${esc(c.description.slice(0,90))}${c.description.length > 90 ? '…' : ''}</div>` : ''}
+          </td>
+          <td style="padding:10px 14px;text-align:center;">
+            <span style="font-size:12px;font-weight:700;color:${clr.text};">${c.points || 0} pts</span>
+          </td>
+          <td style="padding:10px 14px;text-align:center;">
+            <span style="font-size:12px;color:var(--text-muted);">${(c.lessons || c.content || []).length || '—'} lessons</span>
+          </td>
+        </tr>`).join('');
+
+      return `
+        <div style="background:white;border-radius:16px;border:1px solid var(--slate-200);overflow:hidden;margin-bottom:20px;box-shadow:var(--shadow-sm);">
+          <div style="padding:14px 20px;background:${clr.bg};border-bottom:2px solid ${clr.border};display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div style="width:32px;height:32px;border-radius:8px;background:${clr.border};display:flex;align-items:center;justify-content:center;opacity:0.9;">${subject.icon ? `<span style="filter:brightness(0) invert(1);display:flex;width:18px;height:18px;">${subject.icon}</span>` : ''}</div>
+              <span style="font-weight:800;font-size:15px;color:${clr.text};">${esc(subject.title)}</span>
+            </div>
+            <span style="font-size:12px;font-weight:600;color:${clr.text};background:white;border:1px solid ${clr.border};border-radius:999px;padding:2px 12px;">${courses.length} courses</span>
+          </div>
+          <table style="width:100%;border-collapse:collapse;">
+            <thead>
+              <tr style="border-bottom:1px solid var(--slate-100);">
+                <th style="padding:8px 14px;text-align:left;font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;">#</th>
+                <th style="padding:8px 14px;text-align:left;font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;">Course Title</th>
+                <th style="padding:8px 14px;text-align:center;font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;">Points</th>
+                <th style="padding:8px 14px;text-align:center;font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;">Lessons</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>`;
+    }).join('');
+}
+
+function filterAdminCourses(q) { renderAdminCourses(q); }
+
+/* ════════════════════════════════════
    DRAW MANAGEMENT
 ════════════════════════════════════ */
 const DRAW_TIERS = [
-  { id: 'bronze',  label: 'Bronze',  icon: 'B', cost: 50,  prize: 'NT$500',   color: 'bronze' },
-  { id: 'gold',    label: 'Gold',    icon: 'G', cost: 100, prize: 'NT$1,000', color: 'gold'   },
+  { id: 'bronze',  label: 'Bronze',  icon: 'B', cost: 50,  prize: 'NT$200',   color: 'bronze' },
+  { id: 'gold',    label: 'Gold',    icon: 'G', cost: 100, prize: 'NT$500',   color: 'gold'   },
   { id: 'diamond', label: 'Diamond', icon: 'D', cost: 200, prize: 'NT$2,000', color: 'diamond'}
 ];
 
@@ -2041,15 +2178,93 @@ async function pickWinner(tier, btn) {
       return;
     }
 
-    showToast(`Winner selected: ${data.winner}`);
-    // Refresh draw data to reflect new winner
+    // Refresh draw data to reflect new winner, then show celebration
     await loadDraws();
+    showWinnerCelebration(data.winner, tier, data.totalEntries);
 
   } catch (e) {
     showToast('Error picking winner: ' + e.message);
     btn.disabled  = false;
     btn.innerHTML = original;
   }
+}
+
+/* ════════════════════════════════════
+   WINNER CELEBRATION
+════════════════════════════════════ */
+const TIER_EMOJIS   = { bronze: '🥉', gold: '🥇', diamond: '💎' };
+const TIER_PRIZES   = { bronze: 'NT$200',  gold: 'NT$500', diamond: 'NT$2,000' };
+const CONFETTI_COLORS = ['#f59e0b','#7c3aed','#2563eb','#10b981','#ec4899','#ef4444','#fbbf24','#6366f1'];
+
+function showWinnerCelebration(winnerName, tier, totalEntries) {
+  const overlay = document.getElementById('winnerCelebration');
+  const emoji   = TIER_EMOJIS[tier] || '🏆';
+  const prize   = TIER_PRIZES[tier]  || '';
+  const tierLabel = tier.charAt(0).toUpperCase() + tier.slice(1);
+
+  document.getElementById('winnerEmoji').textContent = emoji;
+  document.getElementById('winnerNameDisplay').textContent = winnerName;
+  document.getElementById('winnerTierDisplay').textContent =
+    `${tierLabel} Draw Winner · ${prize} Gift Card · Drawn from ${totalEntries} entr${totalEntries === 1 ? 'y' : 'ies'}`;
+
+  overlay.style.display = 'flex';
+  requestAnimationFrame(() => launchConfetti());
+}
+
+function closeWinnerCelebration() {
+  document.getElementById('winnerCelebration').style.display = 'none';
+  stopConfetti();
+}
+
+// Simple canvas confetti
+let _confettiAnim = null;
+let _confettiParticles = [];
+
+function launchConfetti() {
+  const canvas = document.getElementById('confettiCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  canvas.width  = canvas.offsetWidth;
+  canvas.height = canvas.offsetHeight;
+
+  _confettiParticles = Array.from({ length: 90 }, () => ({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height - canvas.height,
+    w: Math.random() * 10 + 5,
+    h: Math.random() * 5 + 3,
+    color: CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)],
+    vy: Math.random() * 2.5 + 1.5,
+    vx: (Math.random() - 0.5) * 1.5,
+    angle: Math.random() * Math.PI * 2,
+    spin: (Math.random() - 0.5) * 0.15,
+    opacity: 1
+  }));
+
+  function frame() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    _confettiParticles.forEach(p => {
+      p.y     += p.vy;
+      p.x     += p.vx;
+      p.angle += p.spin;
+      if (p.y > canvas.height * 0.7) p.opacity = Math.max(0, p.opacity - 0.02);
+      ctx.save();
+      ctx.globalAlpha = p.opacity;
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.angle);
+      ctx.fillStyle = p.color;
+      ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+      ctx.restore();
+    });
+    _confettiParticles = _confettiParticles.filter(p => p.opacity > 0);
+    if (_confettiParticles.length > 0) _confettiAnim = requestAnimationFrame(frame);
+  }
+  if (_confettiAnim) cancelAnimationFrame(_confettiAnim);
+  _confettiAnim = requestAnimationFrame(frame);
+}
+
+function stopConfetti() {
+  if (_confettiAnim) cancelAnimationFrame(_confettiAnim);
+  _confettiParticles = [];
 }
 </script>
 </body>
