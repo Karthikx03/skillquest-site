@@ -425,9 +425,9 @@ app.get('/api/draws/my-wins', authMiddleware, async (req, res) => {
     const wins = await q(
       `SELECT draw_tier, month_key, picked_at
        FROM draw_winners
-       WHERE winner_user_id = $1
+       WHERE winner_user_id::text = $1::text
        ORDER BY picked_at DESC`,
-      [req.user.id]
+      [String(req.user.id)]
     );
     res.json({ wins });
   } catch (err) { res.status(500).json({ error: 'Server error.' }); }

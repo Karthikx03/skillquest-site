@@ -1933,12 +1933,23 @@ function showToast(msg) {
    COURSE CATALOGUE
 ════════════════════════════════════ */
 let _allCoursesFlat = null;
+let _coursesReady   = false;
 
 function renderAdminCourses(filterQ) {
-  if (!window.SUBJECTS) return;
-  if (!_allCoursesFlat) {
+  // SUBJECTS is defined with `const` in data.js — it does NOT appear on window.
+  // Use typeof to check existence without a ReferenceError.
+  if (typeof SUBJECTS === 'undefined' || !Array.isArray(SUBJECTS) || !SUBJECTS.length) {
+    document.getElementById('coursesCatalogueGrid').innerHTML =
+      '<div style="text-align:center;padding:60px;color:var(--text-muted);">Course data not loaded. Please refresh the page.</div>';
+    return;
+  }
+  // Always rebuild the flat list in case this is the first call after data loaded
+  if (!_coursesReady) {
     _allCoursesFlat = [];
-    SUBJECTS.forEach(s => s.courses.forEach(c => _allCoursesFlat.push({ ...c, subjectId: s.id, subjectTitle: s.title, subjectColor: s.color })));
+    SUBJECTS.forEach(s => s.courses.forEach(c =>
+      _allCoursesFlat.push({ ...c, subjectId: s.id, subjectTitle: s.title, subjectColor: s.color })
+    ));
+    _coursesReady = true;
   }
   const q = (filterQ || '').toLowerCase().trim();
   const filtered = q

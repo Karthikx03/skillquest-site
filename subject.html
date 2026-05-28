@@ -97,32 +97,63 @@
     document.getElementById('subjectCourseCount').textContent = subject.courses.length + ' Courses';
     document.getElementById('subjectPoints').textContent = totalPoints + ' Points Available';
 
-    // YouTube video embed with graceful fallback for unavailable videos.
-    // Uses YouTube's iframe JS API (enablejsapi=1) which posts an onError message
-    // with info=100/101/150 when a video is unavailable or restricted.
+    // YouTube video embed with bullet-proof fallback.
+    // Two detection methods run in parallel — whichever fires first wins:
+    //   1. Timeout: if YouTube doesn't confirm the player is ready within 7s, show fallback.
+    //   2. postMessage: YouTube iframe API sends onError (100/101/150) for unavailable videos.
+    // Both are needed because broken/region-blocked videos never send postMessages at all.
     if (subject.videoId) {
-      const videoSection = document.getElementById('videoSection');
-      const videoFrame   = document.getElementById('videoFrame');
-      const videoFallback = document.getElementById('videoFallback');
+      const videoSection      = document.getElementById('videoSection');
+      const videoFrame        = document.getElementById('videoFrame');
+      const videoFallback     = document.getElementById('videoFallback');
       const videoFallbackLink = document.getElementById('videoFallbackLink');
-      const videoTitle   = document.getElementById('videoSectionTitle');
+      const videoTitle        = document.getElementById('videoSectionTitle');
+
       videoSection.style.display = 'block';
       videoFrame.src = 'https://www.youtube.com/embed/' + subject.videoId +
                        '?rel=0&modestbranding=1&enablejsapi=1';
-      const searchQuery = encodeURIComponent((subject.videoTitle || subject.title) + ' for beginners');
+
+      const searchQuery = encodeURIComponent((subject.videoTitle || subject.title) + ' tutorial');
       videoFallbackLink.href = 'https://www.youtube.com/results?search_query=' + searchQuery;
       if (subject.videoTitle) {
         videoTitle.textContent = subject.videoTitle;
         videoFrame.title = subject.videoTitle;
       }
-      // YouTube iframe API sends postMessage events; error codes 100/101/150 = video unavailable
+
+      let videoResolved = false;
+
+      function showVideoFallback() {
+        if (videoResolved) return;
+        videoResolved = true;
+        videoFrame.style.display = 'none';
+        videoFallback.style.display = 'flex';
+      }
+
+      function markVideoOk() {
+        if (videoResolved) return;
+        videoResolved = true;   // player is alive — cancel the timeout check
+      }
+
+      // Method 1: 7-second timeout — if video hasn't confirmed ready, assume unavailable
+      const videoTimeout = setTimeout(showVideoFallback, 7000);
+
+      // Method 2: YouTube postMessage — catches both errors AND successful load
       window.addEventListener('message', function onYTMsg(evt) {
         if (evt.origin !== 'https://www.youtube.com') return;
         try {
           const msg = JSON.parse(evt.data);
+          // onError with code 100/101/150 = video unavailable / playback restricted
           if (msg.event === 'onError' && [100, 101, 150].includes(Number(msg.info))) {
-            videoFrame.style.display = 'none';
-            videoFallback.style.display = 'flex';
+            clearTimeout(videoTimeout);
+            showVideoFallback();
+            window.removeEventListener('message', onYTMsg);
+            return;
+          }
+          // initialDelivery or onStateChange means the player loaded successfully
+          if (msg.event === 'initialDelivery' || msg.event === 'onStateChange' ||
+              msg.event === 'infoDelivery') {
+            clearTimeout(videoTimeout);
+            markVideoOk();
             window.removeEventListener('message', onYTMsg);
           }
         } catch (_) {}
