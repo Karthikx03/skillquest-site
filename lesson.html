@@ -64,7 +64,15 @@
   const course = subject ? subject.courses.find(c => c.id === courseId) : null;
 
   if (!subject || !course) {
-    document.getElementById('lessonTitle').textContent = 'Course not found.';
+    document.getElementById('lessonLayout').innerHTML = `
+      <div style="grid-column:1/-1;text-align:center;padding:80px 24px;">
+        <div style="font-size:56px;margin-bottom:20px;">📚</div>
+        <h2 style="font-size:24px;font-weight:800;color:var(--text-dark);margin-bottom:12px;">Course not found</h2>
+        <p style="color:var(--text-muted);font-size:15px;margin-bottom:28px;max-width:380px;margin-left:auto;margin-right:auto;">
+          That course doesn't exist or the link is incorrect. Browse all subjects to find what you're looking for.
+        </p>
+        <a href="courses.html" class="btn btn-primary">Browse all courses</a>
+      </div>`;
   } else {
     document.title = course.title + ' - SkillQuest';
 

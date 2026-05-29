@@ -206,7 +206,7 @@
     <div class="cd-colon">:</div>
     <div class="cd-cell"><div class="cd-num" id="cdSec">00</div><div class="cd-label">Sec</div></div>
   </div>
-  <div class="countdown-caption">Draw resets at end of each month</div>
+  <div class="countdown-caption" id="countdownCaption">Draw on the last day of this month · Entries reset on the 1st</div>
 </div>
 
 <!-- ── Draw Cards ── -->
@@ -284,12 +284,17 @@
 
   /* ── Countdown ── */
   (function tick() {
-    const now = new Date(), end = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
+    const now = new Date();
+    const end = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
     const d = Math.max(0, end - now), pad = n => String(Math.floor(n)).padStart(2, '0');
     document.getElementById('cdDays').textContent = pad(d / 86400000);
     document.getElementById('cdHrs').textContent  = pad((d % 86400000) / 3600000);
     document.getElementById('cdMin').textContent  = pad((d % 3600000) / 60000);
     document.getElementById('cdSec').textContent  = pad((d % 60000) / 1000);
+    // Show specific draw date in caption
+    const drawDate = end.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+    const capEl = document.getElementById('countdownCaption');
+    if (capEl) capEl.textContent = `Next draw: ${drawDate} · Entries reset on the 1st of each month`;
     setTimeout(tick, 1000);
   })();
 
@@ -332,8 +337,12 @@
         </button>`;
       }
 
+      const enrolledBanner = isEntered
+        ? `<div style="background:#10b981;color:white;text-align:center;font-size:12px;font-weight:800;letter-spacing:0.08em;padding:6px 0;border-radius:12px 12px 0 0;">✅ YOU'RE ENROLLED THIS MONTH</div>`
+        : '';
       return `<div class="draw-card ${tier.color}${isEntered ? ' entered' : ''}">
-        <div class="draw-card-header">
+        ${enrolledBanner}
+        <div class="draw-card-header" style="${isEntered ? 'border-radius:0;' : ''}">
           <span class="draw-icon">${tier.icon}</span>
           <div class="draw-tier-name">${tier.label} Draw</div>
           <div class="draw-prize">${tier.prize}</div>

@@ -26,7 +26,7 @@
         <label class="form-label">Password</label>
         <input type="password" class="form-input" id="loginPassword" placeholder="Enter your password" required>
       </div>
-      <button type="submit" class="btn btn-primary" style="width:100%;margin-top:8px;" id="loginBtn">Login</button>
+      <button type="submit" class="btn btn-primary" style="width:100%;margin-top:8px;" id="loginBtn">Log in</button>
     </form>
     <div class="auth-footer">
       Don't have an account? <a href="signup.html">Sign Up</a>
@@ -54,7 +54,7 @@
     const errDiv   = document.getElementById('loginError');
 
     btn.disabled    = true;
-    btn.textContent = 'Logging in...';
+    btn.textContent = 'Logging in…';
 
     const result = await login(email, password);
     if (result.success) {

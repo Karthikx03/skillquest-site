@@ -103,7 +103,7 @@
     .feature-photo-card h3 {
       font-size: 16px;
       font-weight: 800;
-      color: var(--text-primary);
+      color: var(--text-dark);   /* --text-primary undefined; use --text-dark (#0f172a) */
       margin-bottom: 8px;
     }
     .feature-photo-card p {
@@ -437,7 +437,7 @@
         <img src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=500&q=80&auto=format&fit=crop" alt="Quiz scoring" loading="lazy">
         <div class="fpc-body">
           <h3>Quiz-Based Points</h3>
-          <p>Every course ends with a quiz that tests what you actually absorbed — not just whether you clicked through. Score higher, earn more points, and genuinely retain more. Research consistently shows testing beats re-reading for long-term memory.</p>
+          <p>Every course ends with a short quiz. Score higher, earn more points. It sounds simple — and it is — but testing yourself is the single most effective way to make knowledge stick.</p>
         </div>
       </div>
 
@@ -445,7 +445,7 @@
         <img src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=500&q=80&auto=format&fit=crop" alt="Students competing on leaderboard" loading="lazy">
         <div class="fpc-body">
           <h3>Live Leaderboard</h3>
-          <p>Your rank is public and updates after every quiz. Some people find this motivating; others find it a useful reality check. Either way, it creates a real benchmark that a private progress bar never could.</p>
+          <p>Your rank updates after every quiz and is visible to everyone. It creates a real benchmark — and a reason to keep going when motivation dips.</p>
         </div>
       </div>
 
@@ -453,7 +453,7 @@
         <img src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=500&q=80&auto=format&fit=crop" alt="Certificate of completion" loading="lazy">
         <div class="fpc-body">
           <h3>Course Certificates</h3>
-          <p>Score 80% or above and you unlock a printable certificate. It won't replace a degree, but it's concrete evidence of self-directed learning — and that matters to employers and interviewers more than you might expect.</p>
+          <p>Score 80% or above on the quiz and unlock a printable certificate you can add to LinkedIn or your CV. Concrete proof of what you've learned — no degree required.</p>
         </div>
       </div>
 
@@ -469,7 +469,7 @@
         <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=500&q=80&auto=format&fit=crop" alt="Progress dashboard" loading="lazy">
         <div class="fpc-body">
           <h3>Progress Dashboard</h3>
-          <p>Your personal dashboard tracks every subject, quiz score, and certificate. Useful if you're working through a specific subject area or want to see exactly where you left off across multiple courses.</p>
+          <p>Your dashboard tracks every subject, quiz score, and earned certificate in one place. See exactly where you left off and what to tackle next.</p>
         </div>
       </div>
 
@@ -477,7 +477,7 @@
         <img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=500&q=80&auto=format&fit=crop" alt="Learning at your own pace" loading="lazy">
         <div class="fpc-body">
           <h3>Learn at Your Pace</h3>
-          <p>No deadlines, no cohorts, no expiry dates. Start a lesson, stop mid-way, pick up on a different device three weeks later. The course waits for you.</p>
+          <p>No schedule, no pressure. Your progress saves automatically — pick up on any device, whenever you're ready. The course will still be here.</p>
         </div>
       </div>
 
@@ -565,15 +565,10 @@
       .then(data => {
         if (!data) return;
         if (quizEl && data.totalQuizzes != null) {
-          quizEl.textContent = data.totalQuizzes >= 1000
-            ? (data.totalQuizzes / 1000).toFixed(1).replace(/\.0$/, '') + 'k'
-            : String(data.totalQuizzes);
+          quizEl.textContent = Number(data.totalQuizzes).toLocaleString();
         }
         if (pointsEl && data.totalPoints != null) {
-          const pts = Number(data.totalPoints);
-          pointsEl.textContent = pts >= 1000
-            ? (pts / 1000).toFixed(1).replace(/\.0$/, '') + 'k'
-            : String(pts);
+          pointsEl.textContent = Number(data.totalPoints).toLocaleString();
         }
       })
       .catch(() => {
