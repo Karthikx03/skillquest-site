@@ -598,6 +598,52 @@ app.post('/api/admin/draws/pick-winner', adminMiddleware, async (req, res) => {
   }
 });
 
+// POST /api/admin/draws/reset — clear winner + optionally all entries (with point refunds)
+app.post('/api/admin/draws/reset', adminMiddleware, async (req, res) => {
+  try {
+    const { tier, clearEntries } = req.body || {};
+    if (!tier) return res.status(400).json({ error: 'tier is required.' });
+
+    const monthKey = new Date().toISOString().slice(0, 7);
+
+    // Always remove the winner record for this tier/month
+    await q('DELETE FROM draw_winners WHERE draw_tier = $1 AND month_key = $2', [tier, monthKey]);
+
+    let refunded = 0;
+    if (clearEntries) {
+      // Fetch entries so we can refund points
+      const entries = await q(`
+        SELECT de.user_id, de.points_spent
+        FROM draw_entries de
+        WHERE de.draw_tier = $1 AND de.month_key = $2
+      `, [tier, monthKey]);
+
+      for (const entry of entries) {
+        // Add points back
+        await q(`
+          INSERT INTO user_points (user_id, total) VALUES ($1, $2)
+          ON CONFLICT (user_id) DO UPDATE
+            SET total = user_points.total + $2, updated_at = NOW()
+        `, [entry.user_id, entry.points_spent]);
+        // Log the refund
+        await q(`
+          INSERT INTO points_log (user_id, delta, total, note)
+          SELECT $1, $2, total, $3 FROM user_points WHERE user_id = $1
+        `, [entry.user_id, entry.points_spent, `Draw reset refund — ${tier} draw ${monthKey}`]);
+      }
+
+      // Delete entries so students can re-enroll
+      await q('DELETE FROM draw_entries WHERE draw_tier = $1 AND month_key = $2', [tier, monthKey]);
+      refunded = entries.length;
+    }
+
+    res.json({ ok: true, tier, monthKey, refunded });
+  } catch (err) {
+    console.error('[reset-draw]', err.message);
+    res.status(500).json({ error: 'Server error: ' + err.message });
+  }
+});
+
 // GET /api/admin/export-csv
 app.get('/api/admin/export-csv', adminMiddleware, async (_req, res) => {
   try {

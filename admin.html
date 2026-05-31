@@ -918,6 +918,14 @@
     .draw-pick-btn.diamond:hover { background: #1d4ed8; }
     .draw-pick-btn:disabled { opacity: 0.55; cursor: not-allowed; }
 
+    .draw-reset-btn {
+      display: flex; align-items: center; gap: 6px;
+      width: 100%; padding: 9px 16px; border-radius: 10px; border: 1.5px solid #e2e8f0;
+      background: white; color: #64748b; font-size: 13px; font-weight: 700;
+      cursor: pointer; transition: all 0.15s; margin-top: 8px; justify-content: center;
+    }
+    .draw-reset-btn:hover { background: #fef2f2; border-color: #fca5a5; color: #dc2626; }
+
     .draw-entries-table {
       width: 100%;
       border-collapse: collapse;
@@ -1281,6 +1289,11 @@
               <div class="panel-title">Contact Messages</div>
               <div class="panel-subtitle" id="msgCountLabel">Loading...</div>
             </div>
+            <button class="btn-outline-sm" onclick="loadMessages()" id="msgRefreshBtn"
+              style="display:flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;border:1px solid var(--slate-200);background:white;cursor:pointer;font-size:13px;font-weight:600;color:var(--text-muted);">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>
+              Refresh
+            </button>
           </div>
           <div id="messagesContainer">
             <div class="empty-state">
@@ -1519,8 +1532,9 @@ async function refreshAll() {
   if (usersRes.status    === 'fulfilled') allUsers    = usersRes.value;
   if (messagesRes.status === 'fulfilled') allMessages = messagesRes.value;
 
-  if (statsRes.status    === 'rejected') showToast('Stats error: ' + statsRes.reason?.message);
-  if (usersRes.status    === 'rejected') showToast('Users error: ' + usersRes.reason?.message);
+  if (statsRes.status    === 'rejected') showToast('Stats error: '    + statsRes.reason?.message);
+  if (usersRes.status    === 'rejected') showToast('Users error: '    + usersRes.reason?.message);
+  if (messagesRes.status === 'rejected') showToast('Messages error: ' + messagesRes.reason?.message);
 
   renderOverview();
   renderUsersTable();
@@ -1552,8 +1566,9 @@ function showPage(id, btn) {
   document.getElementById('page-' + id).classList.add('active');
   if (btn) btn.classList.add('active');
   document.getElementById('topbarTitle').textContent = PAGE_TITLES[id] || id;
-  if (id === 'draws')   loadDraws();
-  if (id === 'courses') renderAdminCourses();
+  if (id === 'draws')    loadDraws();
+  if (id === 'courses')  renderAdminCourses();
+  if (id === 'messages') loadMessages();   // always fetch fresh when navigating to Messages
 }
 
 /* ════════════════════════════════════
@@ -1798,6 +1813,22 @@ function renderLeaderboard() {
 /* ════════════════════════════════════
    RENDER: MESSAGES
 ════════════════════════════════════ */
+async function loadMessages() {
+  const btn = document.getElementById('msgRefreshBtn');
+  if (btn) btn.disabled = true;
+  document.getElementById('msgCountLabel').textContent = 'Loading…';
+  try {
+    const data = await apiFetch('/api/admin/messages');
+    allMessages = Array.isArray(data) ? data : [];
+  } catch (e) {
+    showToast('Messages error: ' + e.message);
+    allMessages = [];
+  } finally {
+    if (btn) btn.disabled = false;
+  }
+  renderMessages();
+}
+
 function renderMessages() {
   const count = allMessages.length;
   document.getElementById('msgCountLabel').textContent =
@@ -2094,6 +2125,14 @@ function renderDraws(data) {
 
     const btnLabel = winner ? 'Re-pick Winner' : 'Pick Winner Randomly';
     const btnDisabled = count === 0 ? 'disabled' : '';
+    // Show Reset button when there's a winner or at least one entry
+    const showReset = winner || count > 0;
+    const resetHtml = showReset ? `
+      <button class="draw-reset-btn" onclick="resetDraw('${tier.id}', ${count})"
+        title="Clear winner and re-open enrollment">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>
+        Reset Draw
+      </button>` : '';
 
     return `
       <div class="draw-tier-card">
@@ -2116,6 +2155,7 @@ function renderDraws(data) {
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
             ${count === 0 ? 'No Entries Yet' : btnLabel}
           </button>
+          ${resetHtml}
         </div>
       </div>
     `;
@@ -2197,6 +2237,45 @@ async function pickWinner(tier, btn) {
     showToast('Error picking winner: ' + e.message);
     btn.disabled  = false;
     btn.innerHTML = original;
+  }
+}
+
+/* ════════════════════════════════════
+   RESET DRAW
+════════════════════════════════════ */
+async function resetDraw(tier, entryCount) {
+  const tierLabel = DRAW_TIERS.find(t => t.id === tier)?.label || tier;
+
+  // Step 1: ask whether to also clear student entries (with point refunds)
+  const clearEntries = entryCount > 0 && confirm(
+    `Reset the ${tierLabel} Draw?\n\n` +
+    `Click OK to FULLY RESET:\n` +
+    `  • Remove the current winner\n` +
+    `  • Remove all ${entryCount} enrolment${entryCount !== 1 ? 's' : ''}\n` +
+    `  • Refund points to enrolled students\n` +
+    `  • Students can enrol again immediately\n\n` +
+    `Click Cancel to ONLY clear the winner (entries stay, re-pick is still possible).`
+  );
+
+  // If no entries exist, just confirm clearing the winner
+  if (entryCount === 0 && !confirm(`Clear the winner for the ${tierLabel} Draw so a new winner can be picked?`)) return;
+
+  try {
+    const res = await fetch(`${API_BASE}/api/admin/draws/reset`, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminToken}` },
+      body: JSON.stringify({ tier, clearEntries: !!clearEntries })
+    });
+    const data = await res.json();
+    if (!res.ok) { showToast(data.error || 'Reset failed.'); return; }
+
+    const msg = clearEntries
+      ? `${tierLabel} Draw reset. ${data.refunded} student${data.refunded !== 1 ? 's' : ''} refunded — enrolment is open again.`
+      : `${tierLabel} winner cleared. Entries remain; you can pick a new winner.`;
+    showToast(msg);
+    await loadDraws();
+  } catch (e) {
+    showToast('Reset error: ' + e.message);
   }
 }
 
